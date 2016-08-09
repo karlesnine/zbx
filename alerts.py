@@ -2,6 +2,10 @@
 # Usage: alerts.py
 # Summary: Zabbix commands
 # Help: Commands for Zabbix
+# Python3 compiante only
+# embed for failback : [pyzabbix 0.7.4](https://github.com/lukecyca/pyzabbix)
+# embed for failback : [tabulate 0.7.5](https://bitbucket.org/cesan3/python-tabulate) commit 3392795 - with fix #65 for ANSI Color
+
 
 import re
 import configparser
@@ -40,7 +44,6 @@ UnBold="\033(B\033[m"
 # Connection to the zabbix api
 zapi = ZabbixAPI(ZABBIX_SERVER)
 zapi.login(ZABBIX_USER,ZABBIX_PASSWORD)
-
 
 TableauAlerte =[]
 triggers = zapi.trigger.get(limite=200,
