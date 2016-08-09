@@ -1,0 +1,7 @@
+[zabbix]
+# The hostname at which the Zabbix web interface is available
+server=https://zabbix.priv/
+# User login to the Zabbix API
+user=LOGIN
+# User paswword to the Zabbix API
+password=PASSWORD
