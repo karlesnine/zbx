@@ -6,5 +6,19 @@ zabbix command line interface
 - [Use Click (6.2 tested)](https://github.com/pallets/click) a command line library for Python
 
 ## Install
+#### Mandatory 
 - Rename `config.ini.example` to `config.ini`
 - Add server url, login and password in `config.ini`
+- run `sudo pip3 install click`
+
+#### Optional
+- run `sudo pip3 install pyzabbix`
+- run `sudo pip3 install tabulate`
+
+## Versions
+
+- 1.0.0
+	- rename to zbx
+	- use click for implement argument & option 
+- 0.0.0
+	- p.o.c alerts.py
