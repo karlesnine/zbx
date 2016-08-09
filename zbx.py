@@ -14,6 +14,10 @@ import os
 import sys
 from datetime import datetime
 
+# Find where the code is
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Import or use the embed version of fail with a correct warning msg
 try:
     import click
 except ImportError:
@@ -23,15 +27,16 @@ try:
 	from pyzabbix import ZabbixAPI
 	from tabulate import tabulate
 except:
-	BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 	vendor_dir = os.path.join(BASE_DIR, 'vendor/python')
 	sys.path.append(vendor_dir)
 	from pyzabbix import ZabbixAPI
 	from tabulate import tabulate
 
-# Import config
+
+# Import config file for zabbix API access
+configfile = BASE_DIR+'/config.ini'
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read(configfile)
 ZABBIX_SERVER = config['zabbix']['server']
 ZABBIX_USER = config['zabbix']['user']
 ZABBIX_PASSWORD = config['zabbix']['password']
@@ -43,19 +48,36 @@ eLIGHT_GREEN="\033[1;32m"
 Bold="\033[1m"
 UnBold="\033(B\033[m"
 
-# Connection to the zabbix api
+# Create connection to the zabbix api
 zapi = ZabbixAPI(ZABBIX_SERVER)
 zapi.login(ZABBIX_USER,ZABBIX_PASSWORD)
 
-# use Click,  a command line library for Python
+# use Click, a command line library for Python
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.group(context_settings=CONTEXT_SETTINGS)
 @click.version_option(version='1.0.0')
 def zabbix():
-    pass
+	"""This is a Zabbix user command line tools."""
+	pass
 
+# UNMONITORED
+@zabbix.command()
+def unmonitored():
+	"""List all host set in zabbix but not monitored (Disabled)"""
+	TableauUnmonitored =[]
+	unmonitored = zapi.host.get(
+		output='extend',
+		filter={"status":1}
+		)
+	for host in unmonitored:
+		TableauUnmonitored.append([host["name"],"Not monitored"])
+	Header = [Bold+"NAME", "STATUS"+UnBold]
+	print(tabulate(TableauUnmonitored,headers=Header,tablefmt="plain"))
+
+# ALERTS
 @zabbix.command()
 def alerts():
+	"""List the last 200 alerts with all that in "warning" or supperior red if no maintenance is configured or acknowledgement envoy"""
 	TableauAlerte =[]
 	triggers = zapi.trigger.get(limite=200,
 		selectLastEvent='extend',
@@ -97,5 +119,7 @@ def alerts():
 	Header = [Bold+"Host","Last Event","Event Id","Description","Maintenance","Acknowledge"+UnBold]
 	print(tabulate(TableauAlerte,headers=Header,tablefmt="plain"))
 
+
+# MAIN
 if __name__ == '__main__':
 	zabbix()
