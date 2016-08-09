@@ -10,10 +10,15 @@ zabbix command line interface
 - Rename `config.ini.example` to `config.ini`
 - Add server url, login and password in `config.ini`
 - run `sudo pip3 install click`
+- run `pip3 install --no-cache-dir --editable .`
 
 #### Optional
 - run `sudo pip3 install pyzabbix`
 - run `sudo pip3 install tabulate`
+
+## Test
+- run `cd ~` + `wich zbx` 
+- run `zbx --version`from any where in your filesystem tree
 
 ## Versions
 
