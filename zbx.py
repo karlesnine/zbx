@@ -32,7 +32,6 @@ except:
 	from pyzabbix import ZabbixAPI
 	from tabulate import tabulate
 
-
 # Import config file for zabbix API access
 configfile = BASE_DIR+'/config.ini'
 config = configparser.ConfigParser()
@@ -59,6 +58,46 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 def zabbix():
 	"""This is a Zabbix user command line tools."""
 	pass
+
+##########################################################################
+# FUNCTIONS
+##########################################################################
+
+def get_host_id(fqdn):
+	response = zapi.host.get(
+		output='extend',
+		filter={"host": fqdn}
+		)
+    if not response:
+        print("Host not found in Zabbix : %s" % fqdn)
+        sys.exit(42)
+    else:
+	    result = response[0]["hostid"]
+	    return result
+
+##########################################################################
+# Zbx COMMANDS
+##########################################################################
+#@click.option('--add/-remove', is_flag=True, help='add or remove a Host in zabbix server')
+
+@zabbix.command()
+@click.argument('fqdn')
+@click.option('--enable/--disable',default=None, required=True,help='enable or disable Host monitoring')
+def monitor(enable,fqdn):
+	host_id = get_host_id(fqdn)
+	# enable is status = 0
+	if enable:
+		response = zapi.host.update(
+			hostid=host_id,
+			status=0
+			)
+		click.echo('%s is monitored now' % fqdn)
+	else:
+		response = zapi.host.update(
+			hostid=host_id,
+			status=1
+			)
+		click.echo('%s is not monitored now' % fqdn)
 
 # UNMONITORED
 @zabbix.command()
@@ -103,8 +142,6 @@ def alerts():
 			event = zapi.event.get(eventids=EventId,
 				select_acknowledges='extend',
 				output='extend')
-			#print("{0}".format(t))
-			#import pdb; pdb.set_trace()
 			if event[0]['acknowledges']:
 				ack_by = event[0]["acknowledges"][0]["alias"]
 				CleanAckDescription = re.sub('----\[BULK ACKNOWLEDGE\]----', r'', event[0]['acknowledges'][0]['message'] )
