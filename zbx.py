@@ -68,17 +68,16 @@ def get_host_id(fqdn):
 		output='extend',
 		filter={"host": fqdn}
 		)
-    if not response:
-        print("Host not found in Zabbix : %s" % fqdn)
-        sys.exit(42)
-    else:
-	    result = response[0]["hostid"]
-	    return result
+	if not response:
+		print("Host not found in Zabbix : %s" % fqdn)
+		sys.exit(42)
+	else:
+		result = response[0]["hostid"]
+		return result
 
 ##########################################################################
 # Zbx COMMANDS
 ##########################################################################
-#@click.option('--add/-remove', is_flag=True, help='add or remove a Host in zabbix server')
 
 @zabbix.command()
 @click.argument('fqdn')
