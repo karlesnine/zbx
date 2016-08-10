@@ -8,10 +8,11 @@
 # [Use Click a command line library for Python](https://github.com/pallets/click)
 
 import re
-import configparser
 import io
 import os
 import sys
+import socket
+import configparser
 from datetime import datetime
 
 # Find where the code is
@@ -75,14 +76,49 @@ def get_host_id(fqdn):
 		result = response[0]["hostid"]
 		return result
 
+def get_tempate_id(template_name):
+	response = zapi.template.get(
+		output='extend',
+        filter={"host":"Template OS Linux"}
+        )
+	if not response:
+		print("Template not found in Zabbix : %s" % fqdn)
+		sys.exit(42)
+	else:
+		result = response[0]["templateid"]
+		return result
+
 ##########################################################################
 # Zbx COMMANDS
 ##########################################################################
+@zabbix.command()
+@click.argument('fqdn')
+@click.option('--add/--remove',default=None, required=True,help='add or remove a Host of the zabbix server')
+def host(add,fqdn):
+	"""Add or remove a linux host of the zabbix server """
+	if add:
+		template_os_linux = get_tempate_id("Template OS Linux")
+		dns_data = socket.gethostbyname_ex(fqdn)
+		ip = dns_data[2][0]
+		#print("{0}".format(dns_data))
+		#import pdb; pdb.set_trace()
+		response = zapi.host.create(
+			host=fqdn,
+			interfaces={"type":1,"main":1,"useip":0,"ip":ip,"dns":fqdn,"port":"10050"},
+			groups={"groupid":"5"},
+			templates={"templateid":template_os_linux}
+			)
+		click.echo('%s id %s is added with basic linux template' % (fqdn, response["hostids"][0]))
+	else:
+		host_id = get_host_id(fqdn)
+		response = zapi.host.delete(host_id)
+		click.echo('%s id %s is removed of the zabbix server' % (fqdn, response["hostids"][0]))
 
 @zabbix.command()
 @click.argument('fqdn')
 @click.option('--enable/--disable',default=None, required=True,help='enable or disable Host monitoring')
 def monitor(enable,fqdn):
+	"""Enable or Disable monitoring for the host specified"""
 	host_id = get_host_id(fqdn)
 	# enable is status = 0
 	if enable:
