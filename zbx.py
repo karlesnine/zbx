@@ -8,6 +8,7 @@ import re
 import io
 import os
 import sys
+import time
 import socket
 import configparser
 from datetime import datetime
@@ -119,6 +120,7 @@ def get_maintenance_id(host_id):
 
 def delete_maintenance(maintenance_id):
 	response = zapi.maintenance.delete(maintenance_id,)
+	error = response.get('error')
 	if not response:
 		print("Maintenance not found in Zabbix")
 		sys.exit(42)
@@ -149,12 +151,30 @@ def list():
 def remove(fqdn):
 	"""Remove a maintenance for the host specified """
 	host_id = get_host_id(fqdn)
-	# click.echo('%s' % host_id)
 	maintenance_id = get_maintenance_id(host_id)
-	#click.echo('%s' % maintenance_id)
 	response = delete_maintenance(maintenance_id)
 	click.echo('Maintenance id %s for %s removed' % (response, fqdn))
 	#import pdb; pdb.set_trace()
+
+@maintenance.command()
+def gc():
+	response = zapi.maintenance.get(
+	output='extend',
+	selectGroups='extend',
+	selectTimeperiods='extend',
+     )
+	to_remove = []
+	for maintenance in response:
+		now = int(time.time())
+		if int(maintenance['active_till']) < now:
+			to_remove.append(maintenance)
+	if len(to_remove) != 0:
+		for m in to_remove:
+			#import pdb; pdb.set_trace()
+			print("Removing expired %s" % m['name'])
+			delete_maintenance(m['maintenanceid'])
+	else:
+		print("No expired maintenance to remove")
 
 ##########################################################################
 # zbx general COMMANDS
