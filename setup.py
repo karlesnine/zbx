@@ -2,7 +2,7 @@
 # zbx setup.py
 from setuptools import setup
 
-import zbx
+#import zbx
 setup(name = 'zbx',
 	version = '1.0.0',
 	author = 'karles',
@@ -12,7 +12,6 @@ setup(name = 'zbx',
 	url = 'https://stash.priv.blablacar.net/projects/ADMIN/repos/zbxcli/browse',
 	description = 'cli for zabbix',
 	long_description = 'cli tool for zabbix user',
-	install_requires = ['click>=6.0'],
 	license = 'GPL V3',
 	plateformes = 'ALL',
 	entry_points={
@@ -20,4 +19,10 @@ setup(name = 'zbx',
               'zbx = zbx:zabbix'
           ],
     },
+    install_requires=[
+          'click>=6.6',
+          'Requests>=2.11.0',
+          'tabulate>=0.7.5',
+          'pyzabbix>=0.7.4',
+      ],
 	)
