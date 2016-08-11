@@ -12,6 +12,13 @@ import socket
 import configparser
 from datetime import datetime
 
+# import logging
+# stream = logging.StreamHandler(sys.stdout)
+# stream.setLevel(logging.DEBUG)
+# log = logging.getLogger('pyzabbix')
+# log.addHandler(stream)
+# log.setLevel(logging.DEBUG)
+
 # Find where the code is
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -62,6 +69,7 @@ def zabbix():
 
 @zabbix.group()
 def maintenance ():
+	"""maintenances management sub-commands"""
 	pass
 
 ##########################################################################
@@ -86,7 +94,7 @@ def get_tempate_id(template_name):
         filter={"host":"Template OS Linux"}
         )
 	if not response:
-		print("Template not found in Zabbix : %s" % fqdn)
+		print("Template not found in Zabbix : %s" % template_name)
 		sys.exit(42)
 	else:
 		result = response[0]["templateid"]
@@ -95,22 +103,62 @@ def get_tempate_id(template_name):
 def to_date(ts):
     return datetime.fromtimestamp(int(ts)).strftime('%Y-%m-%d %H:%M:%S')
 
+def get_maintenance_id(host_id):
+	response = zapi.maintenance.get(
+		output='extend',
+		selectHosts='refer',
+		selectGroups='refer',
+		hostids=host_id
+		)
+	if not response:
+		print("Maintenance not found in Zabbix")
+		sys.exit(42)
+	else:
+		result = response[0]["maintenanceid"]
+		return result
+
+def delete_maintenance(maintenance_id):
+	response = zapi.maintenance.delete(maintenance_id,)
+	if not response:
+		print("Maintenance not found in Zabbix")
+		sys.exit(42)
+	else:
+		result = response["maintenanceids"]
+		return result
+
 ##########################################################################
-# Zbx COMMANDS
+# Maintenance sub command
 ##########################################################################
 
 @maintenance.command()
 def list():
-    response = zapi.maintenance.get(
+	"""List all maintenance currently set in the zabbix server"""
+	response = zapi.maintenance.get(
     	output='extend',
     	selectGroups='extend',
     	selectTimeperiods='extend',
     	)
-    TableauMaintenance = []
-    for m in response:
-    	TableauMaintenance.append([m["name"],m["description"],to_date(m["active_since"]),to_date(m["active_till"])])
-    Header = [Bold+"NAME", "DESCRIPTION", "ACTIVE SINCE", "ACTIVE UNTIL"+UnBold]
-    print(tabulate(TableauMaintenance,headers=Header,tablefmt="plain"))
+	TableauMaintenance = []
+	for m in response:
+		TableauMaintenance.append([m["name"],m["description"],to_date(m["active_since"]),to_date(m["active_till"])])
+	Header = [Bold+"NAME", "DESCRIPTION", "ACTIVE SINCE", "ACTIVE UNTIL"+UnBold]
+	print(tabulate(TableauMaintenance,headers=Header,tablefmt="plain"))
+
+@maintenance.command()
+@click.argument('fqdn')
+def remove(fqdn):
+	"""Remove a maintenance for the host specified """
+	host_id = get_host_id(fqdn)
+	# click.echo('%s' % host_id)
+	maintenance_id = get_maintenance_id(host_id)
+	#click.echo('%s' % maintenance_id)
+	response = delete_maintenance(maintenance_id)
+	click.echo('Maintenance id %s for %s removed' % (response, fqdn))
+	#import pdb; pdb.set_trace()
+
+##########################################################################
+# zbx general COMMANDS
+##########################################################################
 
 @zabbix.command()
 @click.argument('fqdn')
@@ -121,8 +169,6 @@ def host(add,fqdn):
 		template_os_linux = get_tempate_id("Template OS Linux")
 		dns_data = socket.gethostbyname_ex(fqdn)
 		ip = dns_data[2][0]
-		#print("{0}".format(dns_data))
-		#import pdb; pdb.set_trace()
 		response = zapi.host.create(
 			host=fqdn,
 			interfaces={"type":1,"main":1,"useip":0,"ip":ip,"dns":fqdn,"port":"10050"},
@@ -211,7 +257,6 @@ def alerts():
 		TableauAlerte.append(Alerte)
 	Header = [Bold+"Host","Last Event","Event Id","Description","Maintenance","Acknowledge"+UnBold]
 	print(tabulate(TableauAlerte,headers=Header,tablefmt="plain"))
-
 
 # MAIN
 if __name__ == '__main__':
