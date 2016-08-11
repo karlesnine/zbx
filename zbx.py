@@ -158,6 +158,7 @@ def remove(fqdn):
 
 @maintenance.command()
 def gc():
+	"""maintenance garbage collector : remove all expired maintenance"""
 	response = zapi.maintenance.get(
 	output='extend',
 	selectGroups='extend',
