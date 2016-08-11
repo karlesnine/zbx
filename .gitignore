@@ -1,3 +1,4 @@
+vendor/python/__pycache__/
 zbx.egg-info/
 __pycache__/
 vendor/python/__pycache__/*
