@@ -2,10 +2,7 @@
 # Usage: zbx.py
 # Summary: Zabbix commands line interface
 # Help: Commands for Zabbix
-# Python3 compiante only
-# Embed for failback : [pyzabbix 0.7.4](https://github.com/lukecyca/pyzabbix)
-# Embed for failback : [tabulate 0.7.5](https://bitbucket.org/cesan3/python-tabulate) commit 3392795 - with fix #65 for ANSI Color
-# [Use Click a command line library for Python](https://github.com/pallets/click)
+# Dude, Chick, Read the f****** README.md for dependancy and compliance !!
 
 import re
 import io
@@ -20,18 +17,21 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Import or use the embed version of fail with a correct warning msg
 try:
-    import click
+	import click
 except ImportError:
     sys.exit("You need Click! install it from https://github.com/pallets/click or run : sudo pip3 install click.")
 
 try:
-	from pyzabbix import ZabbixAPI
-	from tabulate import tabulate
-except:
-	vendor_dir = os.path.join(BASE_DIR, 'vendor/python')
-	sys.path.append(vendor_dir)
-	from pyzabbix import ZabbixAPI
-	from tabulate import tabulate
+	import requests
+except ImportError:
+    sys.exit("You need requests! install it from https://github.com/kennethreitz/requests or run : sudo pip3 install requests.")
+
+# Force lib version embedded
+# Because tested or patched !
+vendor_dir = os.path.join(BASE_DIR, 'vendor/python')
+sys.path.append(vendor_dir)
+from pyzabbix import ZabbixAPI
+from tabulate import tabulate
 
 # Import config file for zabbix API access
 configfile = BASE_DIR+'/config.ini'
@@ -58,6 +58,10 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.version_option(version='1.0.0')
 def zabbix():
 	"""This is a Zabbix user command line tools."""
+	pass
+
+@zabbix.group()
+def maintenance ():
 	pass
 
 ##########################################################################
@@ -88,9 +92,26 @@ def get_tempate_id(template_name):
 		result = response[0]["templateid"]
 		return result
 
+def to_date(ts):
+    return datetime.fromtimestamp(int(ts)).strftime('%Y-%m-%d %H:%M:%S')
+
 ##########################################################################
 # Zbx COMMANDS
 ##########################################################################
+
+@maintenance.command()
+def list():
+    response = zapi.maintenance.get(
+    	output='extend',
+    	selectGroups='extend',
+    	selectTimeperiods='extend',
+    	)
+    TableauMaintenance = []
+    for m in response:
+    	TableauMaintenance.append([m["name"],m["description"],to_date(m["active_since"]),to_date(m["active_till"])])
+    Header = [Bold+"NAME", "DESCRIPTION", "ACTIVE SINCE", "ACTIVE UNTIL"+UnBold]
+    print(tabulate(TableauMaintenance,headers=Header,tablefmt="plain"))
+
 @zabbix.command()
 @click.argument('fqdn')
 @click.option('--add/--remove',default=None, required=True,help='add or remove a Host of the zabbix server')
