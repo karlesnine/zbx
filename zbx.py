@@ -128,9 +128,33 @@ def delete_maintenance(maintenance_id):
 		result = response["maintenanceids"]
 		return result
 
+def add_maintenance(host_id,duration,fqdn):
+	start = int(time.time()) - 300 # start maintenance 5 minutes before now to avoid overlapping
+	end = start + int(duration) + 300
+	response = zapi.maintenance.create(
+		groupids = ["5"],
+		hostids = [host_id],
+		name = "Scripted Maintenance: %s" % fqdn,
+		maintenance_type = 0,
+		description = "zbx scripted",
+		active_since = start,
+		active_till = end,
+		timeperiods = [{"timeperiod_type":0,"start_date":start,"period":duration}],
+		)
+	return response
+
 ##########################################################################
 # Maintenance sub command
 ##########################################################################
+
+@maintenance.command()
+@click.argument('fqdn')
+@click.argument('duration', default = 3600)
+def add(fqdn,duration):
+	"""add a maintenance for the host specified """
+	host_id = get_host_id(fqdn)
+	click.echo('Adding maintenance for %s during %s secondes' % (fqdn, duration))
+	response = add_maintenance(host_id,duration,fqdn)
 
 @maintenance.command()
 def list():
@@ -171,7 +195,6 @@ def gc():
 			to_remove.append(maintenance)
 	if len(to_remove) != 0:
 		for m in to_remove:
-			#import pdb; pdb.set_trace()
 			print("Removing expired %s" % m['name'])
 			delete_maintenance(m['maintenanceid'])
 	else:
@@ -222,7 +245,6 @@ def monitor(enable,fqdn):
 			)
 		click.echo('%s is not monitored now' % fqdn)
 
-# UNMONITORED
 @zabbix.command()
 def unmonitored():
 	"""List all host set in zabbix but not monitored (Disabled)"""
@@ -236,7 +258,6 @@ def unmonitored():
 	Header = [Bold+"NAME", "STATUS"+UnBold]
 	print(tabulate(TableauUnmonitored,headers=Header,tablefmt="plain"))
 
-# ALERTS
 @zabbix.command()
 def alerts():
 	"""List the last 200 alerts with all that in "warning" or supperior red if no maintenance is configured or acknowledgement envoy"""
