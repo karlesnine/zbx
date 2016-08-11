@@ -2,7 +2,6 @@
 # zbx setup.py
 from setuptools import setup
 
-#import zbx
 setup(name = 'zbx',
 	version = '1.0.0',
 	author = 'karles',
