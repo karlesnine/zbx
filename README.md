@@ -3,7 +3,8 @@ zabbix command line interface
 - Python3
 - [pyzabbix 0.7.4](https://github.com/lukecyca/pyzabbix)
 - [tabulate 0.7.5](https://bitbucket.org/cesan3/python-tabulate) commit 3392795 - with fix #65 for ANSI Color
-- [Use Click (6.2 tested)](https://github.com/pallets/click) a command line library for Python
+- [Click (6.6 tested)](https://github.com/pallets/click) a command line library for Python
+- [Requests v2.11.0](https://github.com/kennethreitz/requests) HTTP for Humans
 
 ## Install
 #### Mandatory 
