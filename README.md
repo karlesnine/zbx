@@ -26,12 +26,12 @@ Exemple based on a debian linux box
 
 ## Versions
 - 2.0.0
-  - zbx alert last
+  - zbx alert list
   - zbx alert ack EVEN-ID MESSAGE
-  - zbx host create FQDN
-  - zbx host delete FQDN
+  - zbx host add FQDN
+  - zbx host del FQDN
   - zbx maintenance add FQDN DURATION
-  - zbx maintenance remove FQDN DURATION
+  - zbx maintenance del FQDN DURATION
   - zbx maintenance list
   - zbx maintenance gc
   - zbx monitor enable FQDN
