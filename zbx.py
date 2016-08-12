@@ -37,7 +37,7 @@ except ImportError:
 # Force lib version embedded
 # Because tested or patched !
 vendor_dir = os.path.join(BASE_DIR, 'vendor/python')
-sys.path.append(vendor_dir)
+sys.path.insert(1,vendor_dir)
 from pyzabbix import ZabbixAPI
 from tabulate import tabulate
 
@@ -148,15 +148,6 @@ def add_maintenance(host_id,duration,fqdn):
 ##########################################################################
 
 @maintenance.command()
-@click.argument('fqdn')
-@click.argument('duration', default = 3600)
-def add(fqdn,duration):
-	"""add a maintenance for the host specified """
-	host_id = get_host_id(fqdn)
-	click.echo('Adding maintenance for %s during %s secondes' % (fqdn, duration))
-	response = add_maintenance(host_id,duration,fqdn)
-
-@maintenance.command()
 def list():
 	"""List all maintenance currently set in the zabbix server"""
 	response = zapi.maintenance.get(
@@ -169,6 +160,15 @@ def list():
 		TableauMaintenance.append([m["name"],m["description"],to_date(m["active_since"]),to_date(m["active_till"])])
 	Header = [Bold+"NAME", "DESCRIPTION", "ACTIVE SINCE", "ACTIVE UNTIL"+UnBold]
 	print(tabulate(TableauMaintenance,headers=Header,tablefmt="plain"))
+
+@maintenance.command()
+@click.argument('fqdn')
+@click.argument('duration', default = 3600)
+def add(fqdn,duration):
+	"""add a maintenance for the host specified """
+	host_id = get_host_id(fqdn)
+	click.echo('Adding maintenance for %s during %s secondes' % (fqdn, duration))
+	response = add_maintenance(host_id,duration,fqdn)
 
 @maintenance.command()
 @click.argument('fqdn')
