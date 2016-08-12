@@ -1,11 +1,15 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """blablacar,"""
 # Usage: zbx.py
 # Summary: Zabbix commands line interface
 # Help: Commands for Zabbix
 # Dude, Chick, Read the f****** README.md for dependancy and compliance !!
 
-import configparser
+try:
+    import configparser
+except ImportError:
+    import ConfigParser
+
 import os
 import re
 import socket
@@ -64,7 +68,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
-@click.version_option(version='2.0.0')
+@click.version_option(version='3.0.0')
 def zabbix():
     """Zabbix user command line tools."""
     pass
