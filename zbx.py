@@ -186,8 +186,8 @@ def add_maintenance(host_id, duration, fqdn):
 ##########################################################################
 
 
-@maintenance.command()
-def list():
+@maintenance.command("list")
+def list_maintenance():
     """List all maintenance currently set in the zabbix server"""
     response = zapi.maintenance.get(
         output='extend',
@@ -204,10 +204,10 @@ def list():
     print(tabulate(tableau_maintenance, headers=header, tablefmt="plain"))
 
 
-@maintenance.command()
+@maintenance.command("add")
 @click.argument('fqdn')
 @click.argument('duration', default=3600)
-def add(fqdn, duration):
+def create_a_maintenance(fqdn, duration):
     """Add a maintenance for the host specified."""
     host_id = get_host_id(fqdn)
     click.echo('Adding maintenance for %s during %s secondes' % (fqdn, duration))
@@ -215,9 +215,9 @@ def add(fqdn, duration):
     click.echo('Maintenance id %s for %s added' % (response, fqdn))
 
 
-@maintenance.command()
+@maintenance.command("del")
 @click.argument('fqdn')
-def remove(fqdn):
+def delete_a_maintenance(fqdn):
     """Remove a maintenance for the host specified."""
     host_id = get_host_id(fqdn)
     maintenance_id = get_maintenance_id(host_id)
@@ -251,9 +251,9 @@ def gc():
 ##########################################################################
 
 
-@host.command()
+@host.command("add")
 @click.argument('fqdn')
-def create(fqdn):
+def create_a_host(fqdn):
     """Create a host in zabbix server."""
     template_os_linux = get_template_id("Template OS Linux")
     dns_data = socket.gethostbyname_ex(fqdn)
@@ -267,9 +267,9 @@ def create(fqdn):
     click.echo('%s id %s is added with basic linux template' % (fqdn, response["hostids"][0]))
 
 
-@host.command()
+@host.command("del")
 @click.argument('fqdn')
-def delete(fqdn):
+def delete_a_host(fqdn):
     """Delete a host in zabbix server."""
     host_id = get_host_id(fqdn)
     response = zapi.host.delete(host_id)
@@ -311,8 +311,8 @@ def disable(fqdn):
 ##########################################################################
 
 
-@alert.command()
-def last():
+@alert.command("list")
+def list_alert():
     """List the last 200 alert.
 
     With all that in "warning" or supperior in red
