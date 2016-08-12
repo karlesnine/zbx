@@ -25,6 +25,18 @@ Exemple based on a debian linux box
 - run `zbx --version`from any where in your filesystem tree
 
 ## Versions
+- 2.0.0
+  - zbx alert all 
+  - zbx alert ack EVEN-ID MESSAGE
+  - zbx host create FQDN
+  - zbx host delete FQDN
+  - zbx maintenance add FQDN DURATION
+  - zbx maintenance remove FQDN DURATION
+  - zbx maintenance list
+  - zbx maintenance gc
+  - zbx monitor enable FQDN
+  - zbx monitor disable FQDN
+  - zbx unmonitored
 
 - 1.0.0
 	- rename to zbx
