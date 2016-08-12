@@ -26,7 +26,7 @@ Exemple based on a debian linux box
 
 ## Versions
 - 2.0.0
-  - zbx alert all 
+  - zbx alert last
   - zbx alert ack EVEN-ID MESSAGE
   - zbx host create FQDN
   - zbx host delete FQDN
