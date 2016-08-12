@@ -88,6 +88,12 @@ def monitor():
     pass
 
 
+@zabbix.group()
+def alert():
+    """Alert management sub-commands"""
+    pass
+
+
 ##########################################################################
 # FUNCTIONS
 ##########################################################################
@@ -173,6 +179,7 @@ def add_maintenance(host_id, duration, fqdn):
     )
     result = response["maintenanceids"]
     return result
+
 
 ##########################################################################
 # Maintenance sub command
@@ -268,6 +275,7 @@ def delete(fqdn):
     response = zapi.host.delete(host_id)
     click.echo('%s id %s is removed of the zabbix server' % (fqdn, response["hostids"][0]))
 
+
 ##########################################################################
 # Monitore COMMANDS
 ##########################################################################
@@ -299,26 +307,12 @@ def disable(fqdn):
 
 
 ##########################################################################
-# zbx general COMMANDS
+# Alert COMMANDS
 ##########################################################################
 
 
-@zabbix.command()
-def unmonitored():
-    """List all host set in zabbix but not monitored (Disabled)"""
-    tableau_unmonitored = []
-    unmonitored = zapi.host.get(
-        output='extend',
-        filter={"status": 1}
-    )
-    for host in unmonitored:
-        tableau_unmonitored.append([host["name"], "Not monitored"])
-    header = [Bold + "NAME", "STATUS" + UnBold]
-    print(tabulate(tableau_unmonitored, headers=header, tablefmt="plain"))
-
-
-@zabbix.command()
-def alerts():
+@alert.command()
+def last():
     """List the last 200 alert.
 
     With all that in "warning" or supperior in red
@@ -362,6 +356,38 @@ def alerts():
         tableau_alerte.append(alert)
     header = [Bold + "Host", "Last Event", "Event Id", "Description", "Maintenance", "Acknowledge" + UnBold]
     print(tabulate(tableau_alerte, headers=header, tablefmt="plain"))
+
+
+@alert.command()
+@click.argument('event_id')
+@click.argument('message')
+def ack(event_id, message):
+    """Acknowledge a alert."""
+    response = zapi.event.acknowledge(
+        eventids=event_id,
+        message=message,
+    )
+    click.echo('Alert event %s is acknowledged' % response["eventids"])
+
+
+##########################################################################
+# zbx general COMMANDS
+##########################################################################
+
+
+@zabbix.command()
+def unmonitored():
+    """List all host set in zabbix but not monitored (Disabled)"""
+    tableau_unmonitored = []
+    unmonitored = zapi.host.get(
+        output='extend',
+        filter={"status": 1}
+    )
+    for host in unmonitored:
+        tableau_unmonitored.append([host["name"], "Not monitored"])
+    header = [Bold + "NAME", "STATUS" + UnBold]
+    print(tabulate(tableau_unmonitored, headers=header, tablefmt="plain"))
+
 
 # MAIN
 if __name__ == '__main__':
