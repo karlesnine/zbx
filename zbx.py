@@ -75,6 +75,19 @@ def maintenance():
     """Maintenance management sub-commands"""
     pass
 
+
+@zabbix.group()
+def host():
+    """Host management sub-commands"""
+    pass
+
+
+@zabbix.group()
+def monitor():
+    """Monitore management sub-commands"""
+    pass
+
+
 ##########################################################################
 # FUNCTIONS
 ##########################################################################
@@ -225,52 +238,69 @@ def gc():
     else:
         print("No expired maintenance to remove")
 
+
+##########################################################################
+# Host COMMANDS
+##########################################################################
+
+
+@host.command()
+@click.argument('fqdn')
+def create(fqdn):
+    """Create a host in zabbix server."""
+    template_os_linux = get_template_id("Template OS Linux")
+    dns_data = socket.gethostbyname_ex(fqdn)
+    ip = dns_data[2][0]
+    response = zapi.host.create(
+        host=fqdn,
+        interfaces={"type": 1, "main": 1, "useip": 0, "ip": ip, "dns": fqdn, "port": "10050"},
+        groups={"groupid": "5"},
+        templates={"templateid": template_os_linux}
+    )
+    click.echo('%s id %s is added with basic linux template' % (fqdn, response["hostids"][0]))
+
+
+@host.command()
+@click.argument('fqdn')
+def delete(fqdn):
+    """Delete a host in zabbix server."""
+    host_id = get_host_id(fqdn)
+    response = zapi.host.delete(host_id)
+    click.echo('%s id %s is removed of the zabbix server' % (fqdn, response["hostids"][0]))
+
+##########################################################################
+# Monitore COMMANDS
+##########################################################################
+
+
+@monitor.command()
+@click.argument('fqdn')
+def enable(fqdn):
+    """Enable monitoring for a host."""
+    host_id = get_host_id(fqdn)
+    # enable is status = 0
+    response = zapi.host.update(
+        hostid=host_id,
+        status=0
+    )
+    click.echo('%s id %s is monitored now' % (fqdn, response["hostids"]))
+
+
+@monitor.command()
+@click.argument('fqdn')
+def disable(fqdn):
+    """Disable monitoring for a host."""
+    host_id = get_host_id(fqdn)
+    response = zapi.host.update(
+        hostid=host_id,
+        status=1
+    )
+    click.echo('%s id %s is not monitored now' % (fqdn, response["hostids"]))
+
+
 ##########################################################################
 # zbx general COMMANDS
 ##########################################################################
-
-
-@zabbix.command()
-@click.argument('fqdn')
-@click.option('--add/--remove', default=None, required=True, help='add or remove a Host of the zabbix server')
-def host(add, fqdn):
-    """Add or remove a linux host of the zabbix server."""
-    if add:
-        template_os_linux = get_template_id("Template OS Linux")
-        dns_data = socket.gethostbyname_ex(fqdn)
-        ip = dns_data[2][0]
-        response = zapi.host.create(
-            host=fqdn,
-            interfaces={"type": 1, "main": 1, "useip": 0, "ip": ip, "dns": fqdn, "port": "10050"},
-            groups={"groupid": "5"},
-            templates={"templateid": template_os_linux}
-        )
-        click.echo('%s id %s is added with basic linux template' % (fqdn, response["hostids"][0]))
-    else:
-        host_id = get_host_id(fqdn)
-        response = zapi.host.delete(host_id)
-        click.echo('%s id %s is removed of the zabbix server' % (fqdn, response["hostids"][0]))
-
-
-@zabbix.command()
-@click.argument('fqdn')
-@click.option('--enable/--disable', default=None, required=True, help='enable or disable Host monitoring')
-def monitor(enable, fqdn):
-    """Enable or Disable monitoring for the host specified"""
-    host_id = get_host_id(fqdn)
-    # enable is status = 0
-    if enable:
-        response = zapi.host.update(
-            hostid=host_id,
-            status=0
-        )
-        click.echo('%s id %s is monitored now' % (fqdn, response["hostids"]))
-    else:
-        response = zapi.host.update(
-            hostid=host_id,
-            status=1
-        )
-        click.echo('%s id %s is not monitored now' % (fqdn, response["hostids"]))
 
 
 @zabbix.command()
