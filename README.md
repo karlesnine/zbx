@@ -7,15 +7,18 @@ zabbix command line interface
 - [Requests v2.11.0](https://github.com/kennethreitz/requests) HTTP for Humans
 
 ## Install
-#### Mandatory 
+Exemple based on a debian linux box
+
+#### Python 
+- Install python 3 `apt-get install python3` 
+- Install pip3 `apt-get install python3-pip`
+- Upgrade pip3 `easy_install3 -U pip`
+
+#### zbx 
 - Rename `config.ini.example` to `config.ini`
 - Add server url, login and password in `config.ini`
 - run `sudo pip3 install click`
 - run `pip3 install --no-cache-dir --editable .`
-
-#### Optional
-- run `sudo pip3 install pyzabbix`
-- run `sudo pip3 install tabulate`
 
 ## Test
 - run `cd ~` + `wich zbx` 

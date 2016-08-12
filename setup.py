@@ -21,7 +21,5 @@ setup(name = 'zbx',
     install_requires=[
           'click>=6.6',
           'Requests>=2.11.0',
-          'tabulate>=0.7.5',
-          'pyzabbix>=0.7.4',
       ],
 	)
