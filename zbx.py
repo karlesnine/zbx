@@ -351,8 +351,8 @@ def list_alert():
                 ack_by = event[0]["acknowledges"][0]["alias"]
                 clean_ack_description = re.sub('----\[BULK ACKNOWLEDGE\]----', r'', event[0]['acknowledges'][0]['message'])
                 ack = ack_by + " " + clean_ack_description
-            if t["hosts"][0]["maintenance_status"] == "1":
-                maintenance = "Main.."
+        if t["hosts"][0]["maintenance_status"] == "1":
+            maintenance = "Main.."
         if int(t['priority']) >= 3 and maintenance != "Main.." and not event[0]['acknowledges']:
             alert = [eLIGHT_RED + t['hosts'][0]['name'], last_date, event_id, t["description"], maintenance, ack + eCOLOR_NONE]
         else:
