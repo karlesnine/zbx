@@ -372,9 +372,9 @@ def list_alert():
 
 
 @alert.command("history")
-@click.argument('days')
+@click.argument('days', default=1)
 def history_alerts(days):
-    """Alert history from n days,"""
+    """Alert history for lastt 24h or for n x 24h,"""
     now = int(time.time())
     n_day = int(days)
     secondes = (86400 * n_day)
@@ -409,7 +409,7 @@ def history_alerts(days):
             acked,
             ack_by
         ])
-    tableau_history = sorted(tableau_history,reverse=True)
+    tableau_history = sorted(tableau_history, reverse=True)
     headers = ["Event ID", "Time", "Host", "Subject", "Acked", "Acked by"]
     print(tabulate(tableau_history, headers=headers, tablefmt="plain"))
 
