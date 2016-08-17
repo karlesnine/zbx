@@ -185,6 +185,16 @@ def add_maintenance(host_id, duration, fqdn):
     return result
 
 
+def get_event(eventid):
+    """Get eventid"""
+    response = zapi.event.get(
+        eventids=eventid,
+        output="extend",
+        select_acknowledges="extend",
+    )
+    return response[0]
+
+
 ##########################################################################
 # Maintenance sub command
 ##########################################################################
@@ -279,9 +289,8 @@ def delete_a_host(fqdn):
     response = zapi.host.delete(host_id)
     click.echo('%s id %s is removed of the zabbix server' % (fqdn, response["hostids"][0]))
 
-
 ##########################################################################
-# Monitore COMMANDS
+# Monitor COMMANDS
 ##########################################################################
 
 
@@ -360,6 +369,49 @@ def list_alert():
         tableau_alerte.append(alert)
     header = [Bold + "Host", "Last Event", "Event Id", "Description", "Maintenance", "Acknowledge" + UnBold]
     print(tabulate(tableau_alerte, headers=header, tablefmt="plain"))
+
+
+@alert.command("history")
+@click.argument('days')
+def history_alerts(days):
+    """Alert history from n days,"""
+    now = int(time.time())
+    n_day = int(days)
+    secondes = (86400 * n_day)
+    time_from = now - secondes
+    history = zapi.alert.get(
+        userids=9,
+        output="extend",
+        sortfield="alertid",
+        sortorder="DESC",
+        time_from=time_from,
+    )
+    unique = {each['eventid']: each for each in history}.values()
+    tableau_history = []
+    for alert in unique:
+        event = get_event(alert["eventid"])
+        host, subject = alert["subject"].split(':', 1)
+
+        acked = "No"
+        if event["acknowledged"] == "1":
+            acked = "Yes"
+
+        ack_by = ""
+        if len(event["acknowledges"]) > 0:
+            ack_by = event["acknowledges"][0]["alias"]
+
+        # import pdb; pdb.set_trace()
+        tableau_history.append([
+            event["eventid"],
+            to_date(alert["clock"]),
+            host,
+            subject,
+            acked,
+            ack_by
+        ])
+    tableau_history = sorted(tableau_history,reverse=True)
+    headers = ["Event ID", "Time", "Host", "Subject", "Acked", "Acked by"]
+    print(tabulate(tableau_history, headers=headers, tablefmt="plain"))
 
 
 @alert.command()
