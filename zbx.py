@@ -325,14 +325,16 @@ def disable(fqdn):
 
 
 @alert.command("list")
-def list_alert():
-    """List the last 200 alert.
+@click.argument('nb', default=200)
+def list_alert(nb):
+    """List the last N alert (200 by default).
 
     With all that in "warning" or supperior in red
     if no maintenance is configured or acknowledgement envoy
     """
+    int_nb = int(nb)
     tableau_alerte = []
-    triggers = zapi.trigger.get(limite=200,
+    triggers = zapi.trigger.get(limite=int_nb,
                                 selectLastEvent='extend',
                                 selectGroups='extend',
                                 selectHosts='extend',
