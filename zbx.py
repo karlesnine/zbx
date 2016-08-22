@@ -87,6 +87,12 @@ def host():
 
 
 @zabbix.group()
+def group():
+    """Group management sub-commands"""
+    pass
+
+
+@zabbix.group()
 def monitor():
     """Monitore management sub-commands"""
     pass
@@ -118,7 +124,7 @@ def get_host_id(fqdn):
 
 
 def get_template_id(template_name):
-    """Get the template id"""
+    """Get the template id."""
     response = zapi.template.get(
         output='extend',
         filter={"host": "Template OS Linux"}
@@ -128,6 +134,20 @@ def get_template_id(template_name):
         sys.exit(42)
     else:
         result = response[0]["templateid"]
+        return result
+
+
+def get_group_id(group_name):
+    """Get the group id."""
+    response = zapi.hostgroup.get(
+        output='extend',
+        filter={"name": group_name}
+    )
+    if not response:
+        print("Group Name not found in Zabbix : %s" % group_name)
+        sys.exit(42)
+    else:
+        result = response[0]["groupid"]
         return result
 
 
@@ -288,6 +308,34 @@ def delete_a_host(fqdn):
     host_id = get_host_id(fqdn)
     response = zapi.host.delete(host_id)
     click.echo('%s id %s is removed of the zabbix server' % (fqdn, response["hostids"][0]))
+
+
+##########################################################################
+# Group COMMANDS
+##########################################################################
+
+
+@group.command("list")
+@click.argument('group_name')
+def list_server_in_group(group_name):
+    """List server in groupe name."""
+    group_id = get_group_id(group_name)
+    tableau_server_in_group = []
+    list_servers = zapi.host.get(
+        output='extend',
+        groupids=group_id,
+    )
+    for host in list_servers:
+        tableau_server_in_group.append([host["name"], group_name])
+    header = [Bold + "NAME", "GROUP" + UnBold]
+    print(tabulate(tableau_server_in_group, headers=header, tablefmt="plain"))
+
+
+@group.command("discovered")
+@click.pass_context
+def list_server_in_discovered_group(ctx):
+    r"""List server in \"Discovered hosts\" groupe."""
+    ctx.invoke(list_server_in_group, group_name="Discovered hosts")
 
 ##########################################################################
 # Monitor COMMANDS
