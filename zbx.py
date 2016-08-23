@@ -159,7 +159,7 @@ def to_date(ts):
     return datetime.fromtimestamp(int(ts)).strftime('%Y-%m-%d %H:%M:%S')
 
 
-def get_maintenance_id(host_id):
+def get_maintenance_id(host_id, fqdn):
     """Gate the maintenance id."""
     response = zapi.maintenance.get(
         output='extend',
@@ -169,6 +169,8 @@ def get_maintenance_id(host_id):
     )
     if not response:
         return "not found"
+    elif response[0]["name"] != fqdn:
+        return "generic maintenance: " + response[0]["name"]
     else:
         result = response[0]["maintenanceid"]
         return result
@@ -249,9 +251,28 @@ def create_a_maintenance(fqdn, duration):
         click.echo('Host not found in Zabbix : %s' % fqdn)
         sys.exit(42)
     else:
-        click.echo('Adding maintenance for %s during %s secondes' % (fqdn, duration))
-        response = add_maintenance(host_id, duration, fqdn)
-        click.echo('Maintenance id %s for %s added' % (response, fqdn))
+        maintenance_id = get_maintenance_id(host_id, fqdn)
+        if maintenance_id == "not found":
+            click.echo('Adding maintenance for %s during %s secondes' % (fqdn, duration))
+            response = add_maintenance(host_id, duration, fqdn)
+            click.echo('Maintenance id %s for %s added' % (response, fqdn))
+        else:
+            click.echo('Sorry maintenance already existe for %s ' % (fqdn))
+            if "generic maintenance:" in maintenance_id:
+                click.echo('%s is in %s' % (fqdn, maintenance_id))
+            else:
+                response = zapi.maintenance.get(
+                    output='extend',
+                    selectHosts='refer',
+                    selectGroups='refer',
+                    maintenanceids=maintenance_id
+                )
+                now = int(time.time())
+                duration_plan = int(duration + now)
+                if int(response['active_till']) < duration_plan:
+                    click.echo('update')
+                else:
+                    click.echo('no update')
 
 
 @maintenance.command("del")
@@ -263,7 +284,7 @@ def delete_a_maintenance(fqdn):
         click.echo('Host not found in Zabbix : %s' % fqdn)
         sys.exit(42)
     else:
-        maintenance_id = get_maintenance_id(host_id)
+        maintenance_id = get_maintenance_id(host_id, fqdn)
         if maintenance_id == "not found":
             click.echo('Maintenance not found in Zabbix')
             sys.exit(42)
@@ -346,7 +367,6 @@ def get_list_server_without_template():
     click.secho("-- Host without template --", bold=True)
     for h in response:
         if len(h['parentTemplates']) == 0:
-            # import pdb; pdb.set_trace()
             tableau_server_without_template.append([h["name"], "without template"])
     print(tabulate(tableau_server_without_template, tablefmt="plain"))
 
