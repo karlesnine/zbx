@@ -116,8 +116,9 @@ def get_host_id(fqdn):
         filter={"host": fqdn}
     )
     if not response:
-        print("Host not found in Zabbix : %s" % fqdn)
-        sys.exit(42)
+        # click.echo('Host not found in Zabbix : %s' % fqdn)
+        # sys.exit(42)
+        return "not found"
     else:
         result = response[0]["hostid"]
         return result
@@ -130,8 +131,9 @@ def get_template_id(template_name):
         filter={"host": "Template OS Linux"}
     )
     if not response:
-        print("Template not found in Zabbix : %s" % template_name)
-        sys.exit(42)
+        # click.echo('Template not found in Zabbix : %s' % template_name)
+        # sys.exit(42)
+        return "not found"
     else:
         result = response[0]["templateid"]
         return result
@@ -144,8 +146,9 @@ def get_group_id(group_name):
         filter={"name": group_name}
     )
     if not response:
-        print("Group Name not found in Zabbix : %s" % group_name)
-        sys.exit(42)
+        # click.echo('Group Name not found in Zabbix : %s' % group_name)
+        # sys.exit(42)
+        return "not found"
     else:
         result = response[0]["groupid"]
         return result
@@ -165,8 +168,7 @@ def get_maintenance_id(host_id):
         hostids=host_id
     )
     if not response:
-        print("Maintenance not found in Zabbix")
-        sys.exit(42)
+        return "not found"
     else:
         result = response[0]["maintenanceid"]
         return result
@@ -176,8 +178,7 @@ def delete_maintenance(maintenance_id):
     """Delete the maintenance."""
     response = zapi.maintenance.delete(maintenance_id,)
     if not response:
-        print("Maintenance not found in Zabbix")
-        sys.exit(42)
+        return "not found"
     else:
         result = response["maintenanceids"]
         return result
@@ -244,9 +245,13 @@ def list_maintenance():
 def create_a_maintenance(fqdn, duration):
     """Add a maintenance for the host specified."""
     host_id = get_host_id(fqdn)
-    click.echo('Adding maintenance for %s during %s secondes' % (fqdn, duration))
-    response = add_maintenance(host_id, duration, fqdn)
-    click.echo('Maintenance id %s for %s added' % (response, fqdn))
+    if host_id == "not found":
+        click.echo('Host not found in Zabbix : %s' % fqdn)
+        sys.exit(42)
+    else:
+        click.echo('Adding maintenance for %s during %s secondes' % (fqdn, duration))
+        response = add_maintenance(host_id, duration, fqdn)
+        click.echo('Maintenance id %s for %s added' % (response, fqdn))
 
 
 @maintenance.command("del")
@@ -254,9 +259,17 @@ def create_a_maintenance(fqdn, duration):
 def delete_a_maintenance(fqdn):
     """Remove a maintenance for the host specified."""
     host_id = get_host_id(fqdn)
-    maintenance_id = get_maintenance_id(host_id)
-    response = delete_maintenance(maintenance_id)
-    click.echo('Maintenance id %s for %s removed' % (response, fqdn))
+    if host_id == "not found":
+        click.echo('Host not found in Zabbix : %s' % fqdn)
+        sys.exit(42)
+    else:
+        maintenance_id = get_maintenance_id(host_id)
+        if maintenance_id == "not found":
+            click.echo('Maintenance not found in Zabbix')
+            sys.exit(42)
+        else:
+            response = delete_maintenance(maintenance_id)
+            click.echo('Maintenance id %s for %s removed' % (response, fqdn))
 
 
 @maintenance.command()
@@ -274,10 +287,13 @@ def gc():
             to_remove.append(maintenance)
     if len(to_remove) != 0:
         for m in to_remove:
-            print("Removing expired %s" % m['name'])
-            delete_maintenance(m['maintenanceid'])
+            deleted = delete_maintenance(m['maintenanceid'])
+            if deleted == "not found":
+                click.echo('Maintenance %s not found' % m['name'])
+            else:
+                click.echo('Removing expired %s' % m['name'])
     else:
-        print("No expired maintenance to remove")
+        click.echo('No expired maintenance to remove')
 
 
 ##########################################################################
@@ -290,15 +306,19 @@ def gc():
 def create_a_host(fqdn):
     """Create a host in zabbix server."""
     template_os_linux = get_template_id("Template OS Linux")
-    dns_data = socket.gethostbyname_ex(fqdn)
-    ip = dns_data[2][0]
-    response = zapi.host.create(
-        host=fqdn,
-        interfaces={"type": 1, "main": 1, "useip": 0, "ip": ip, "dns": fqdn, "port": "10050"},
-        groups={"groupid": "5"},
-        templates={"templateid": template_os_linux}
-    )
-    click.echo('%s id %s is added with basic linux template' % (fqdn, response["hostids"][0]))
+    if template_os_linux == "not found":
+        click.echo('template not found in Zabbix : %s' % template_os_linux)
+        sys.exit(42)
+    else:
+        dns_data = socket.gethostbyname_ex(fqdn)
+        ip = dns_data[2][0]
+        response = zapi.host.create(
+            host=fqdn,
+            interfaces={"type": 1, "main": 1, "useip": 0, "ip": ip, "dns": fqdn, "port": "10050"},
+            groups={"groupid": "5"},
+            templates={"templateid": template_os_linux}
+        )
+        click.echo('%s id %s is added with basic linux template' % (fqdn, response["hostids"][0]))
 
 
 @host.command("del")
@@ -306,8 +326,12 @@ def create_a_host(fqdn):
 def delete_a_host(fqdn):
     """Delete a host in zabbix server."""
     host_id = get_host_id(fqdn)
-    response = zapi.host.delete(host_id)
-    click.echo('%s id %s is removed of the zabbix server' % (fqdn, response["hostids"][0]))
+    if host_id == "not found":
+        click.echo('Host not found in Zabbix : %s' % fqdn)
+        sys.exit(42)
+    else:
+        response = zapi.host.delete(host_id)
+        click.echo('%s id %s is removed of the zabbix server' % (fqdn, response["hostids"][0]))
 
 
 @host.command("notemplate")
@@ -319,13 +343,12 @@ def get_list_server_without_template():
         selectParentTemplates=["templateid", "name"],
         selectGroups="extend",
     )
-    print ("\n-- Host without template --\n")
+    click.secho("-- Host without template --", bold=True)
     for h in response:
         if len(h['parentTemplates']) == 0:
             # import pdb; pdb.set_trace()
             tableau_server_without_template.append([h["name"], "without template"])
-    header = [Bold + "Server", "without template" + UnBold]
-    print(tabulate(tableau_server_without_template, headers=header, tablefmt="plain"))
+    print(tabulate(tableau_server_without_template, tablefmt="plain"))
 
 ##########################################################################
 # Group COMMANDS
@@ -337,15 +360,19 @@ def get_list_server_without_template():
 def list_server_in_group(group_name):
     """List server in groupe name."""
     group_id = get_group_id(group_name)
-    tableau_server_in_group = []
-    list_servers = zapi.host.get(
-        output='extend',
-        groupids=group_id,
-    )
-    for host in list_servers:
-        tableau_server_in_group.append([host["name"], group_name])
-    header = [Bold + "NAME", "GROUP" + UnBold]
-    print(tabulate(tableau_server_in_group, headers=header, tablefmt="plain"))
+    if group_id == "not found":
+        click.echo('Group not found in Zabbix : %s' % group_id)
+        sys.exit(42)
+    else:
+        tableau_server_in_group = []
+        list_servers = zapi.host.get(
+            output='extend',
+            groupids=group_id,
+        )
+        for host in list_servers:
+            tableau_server_in_group.append([host["name"], group_name])
+        header = [Bold + "NAME", "GROUP" + UnBold]
+        print(tabulate(tableau_server_in_group, headers=header, tablefmt="plain"))
 
 
 @group.command("discovered")
@@ -371,12 +398,16 @@ def list_server_in_nip_group(ctx):
 def enable(fqdn):
     """Enable monitoring for a host."""
     host_id = get_host_id(fqdn)
-    # enable is status = 0
-    response = zapi.host.update(
-        hostid=host_id,
-        status=0
-    )
-    click.echo('%s id %s is monitored now' % (fqdn, response["hostids"]))
+    if host_id == "not found":
+        click.echo('Host not found in Zabbix : %s' % fqdn)
+        sys.exit(42)
+    else:
+        # enable is status = 0
+        response = zapi.host.update(
+            hostid=host_id,
+            status=0
+        )
+        click.echo('%s id %s is monitored now' % (fqdn, response["hostids"]))
 
 
 @monitor.command()
