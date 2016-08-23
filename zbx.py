@@ -310,6 +310,23 @@ def delete_a_host(fqdn):
     click.echo('%s id %s is removed of the zabbix server' % (fqdn, response["hostids"][0]))
 
 
+@host.command("notemplate")
+def get_list_server_without_template():
+    """List all serveur without template."""
+    tableau_server_without_template = []
+    response = zapi.host.get(
+        output="extend",
+        selectParentTemplates=["templateid", "name"],
+        selectGroups="extend",
+    )
+    print ("\n-- Host without template --\n")
+    for h in response:
+        if len(h['parentTemplates']) == 0:
+            # import pdb; pdb.set_trace()
+            tableau_server_without_template.append([h["name"], "without template"])
+    header = [Bold + "Server", "without template" + UnBold]
+    print(tabulate(tableau_server_without_template, headers=header, tablefmt="plain"))
+
 ##########################################################################
 # Group COMMANDS
 ##########################################################################
@@ -336,6 +353,13 @@ def list_server_in_group(group_name):
 def list_server_in_discovered_group(ctx):
     r"""List server in \"Discovered hosts\" groupe."""
     ctx.invoke(list_server_in_group, group_name="Discovered hosts")
+
+
+@group.command("nip")
+@click.pass_context
+def list_server_in_nip_group(ctx):
+    r"""List server in \"TemporarilyNotInProduction\" groupe."""
+    ctx.invoke(list_server_in_group, group_name="_TemporarilyNotInProduction")
 
 ##########################################################################
 # Monitor COMMANDS
@@ -450,7 +474,6 @@ def history_alerts(days):
         if len(event["acknowledges"]) > 0:
             ack_by = event["acknowledges"][0]["alias"]
 
-        # import pdb; pdb.set_trace()
         tableau_history.append([
             event["eventid"],
             to_date(alert["clock"]),
