@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""blablacar,"""
+"""Zabbix command ligne tools"""
 # Usage: zbx.py
 # Summary: Zabbix commands line interface
 # Help: Commands for Zabbix
@@ -28,12 +28,19 @@ from pyzabbix import ZabbixAPI
 
 from tabulate import tabulate
 
+############################################
+# Use for debug exchange with api
+############################################
 # import logging
 # stream = logging.StreamHandler(sys.stdout)
 # stream.setLevel(logging.DEBUG)
 # log = logging.getLogger('pyzabbix')
 # log.addHandler(stream)
 # log.setLevel(logging.DEBUG)
+############################################
+# Use for debug step by step
+############################################
+# import pdb; pdb.set_trace()
 
 # Import or use the embed version of fail with a correct warning msg
 try:
