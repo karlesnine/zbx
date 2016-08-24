@@ -31,6 +31,10 @@ Exemple based on a debian linux box
 - run `zbx --version`from any where in your filesystem tree
 
 ## Versions
+- 3.0.1
+  - zbx group list
+  - zbx alert history
+  - zbx host notemplate
 - 3.0.0
   - Python 2.7 & 3.5 compliance
 - 2.0.0
