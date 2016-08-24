@@ -8,7 +8,7 @@ Python2.7 & Python3.5 tested
 BlaBlaCar is trusted community marketplace that connects drivers with empty seats to passengers looking for a ride.
 Hoping to give them an effective tool
 
-## Requirements
+## Requirement
 - >= [pyzabbix 0.7.4](https://github.com/lukecyca/pyzabbix)
 - >= [tabulate 0.7.5](https://bitbucket.org/cesan3/python-tabulate) commit 3392795 - with fix #65 for ANSI Color
 - >= [Click (6.6 tested)](https://github.com/pallets/click) a command line library for Python
