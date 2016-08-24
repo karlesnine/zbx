@@ -401,20 +401,6 @@ def list_server_in_group(group_name):
         header = [Bold + "NAME", "GROUP" + UnBold]
         print(tabulate(tableau_server_in_group, headers=header, tablefmt="plain"))
 
-
-@group.command("discovered")
-@click.pass_context
-def list_server_in_discovered_group(ctx):
-    r"""List server in \"Discovered hosts\" groupe."""
-    ctx.invoke(list_server_in_group, group_name="Discovered hosts")
-
-
-@group.command("nip")
-@click.pass_context
-def list_server_in_nip_group(ctx):
-    r"""List server in \"TemporarilyNotInProduction\" groupe."""
-    ctx.invoke(list_server_in_group, group_name="_TemporarilyNotInProduction")
-
 ##########################################################################
 # Monitor COMMANDS
 ##########################################################################
@@ -506,7 +492,7 @@ def list_alert(nb):
 @alert.command("history")
 @click.argument('days', default=1)
 def history_alerts(days):
-    """Alert history for lastt 24h or for n x 24h,"""
+    """Alert history for last 24h or for n x 24h,"""
     now = int(time.time())
     n_day = int(days)
     secondes = (86400 * n_day)
