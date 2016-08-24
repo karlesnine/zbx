@@ -8,25 +8,25 @@ Python2.7 & Python3.5 tested
 BlaBlaCar is trusted community marketplace that connects drivers with empty seats to passengers looking for a ride.
 Hoping to give them an effective tool
 
-## Requierement
+## Requirements
 - >= [pyzabbix 0.7.4](https://github.com/lukecyca/pyzabbix)
 - >= [tabulate 0.7.5](https://bitbucket.org/cesan3/python-tabulate) commit 3392795 - with fix #65 for ANSI Color
 - >= [Click (6.6 tested)](https://github.com/pallets/click) a command line library for Python
 - >= [Requests v2.11.0](https://github.com/kennethreitz/requests) HTTP for Humans
 
 ## Install
-Exemple based on a debian linux box
+Example based on a debian linux box.
 
-#### Python2
+### Python2
 - Install pip `apt-get install python-pip`
 - Upgrade pip `easy_install -U pip`
 - Install ConfigParser `pip install ConfigParser`
-- Install Loggin `pip install logging`
+- Install Logging `pip install logging`
 - Rename `config.ini.example` to `config.ini`
 - Add server url, login and password in `config.ini`
 - run `pip3 install --editable .`
 
-#### Python3
+### Python3
 - Install python 3 `apt-get install python3` 
 - Install pip3 `apt-get install python3-pip`
 - Upgrade pip3 `easy_install3 -U pip`
