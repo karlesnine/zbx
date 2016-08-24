@@ -177,7 +177,10 @@ def get_maintenance_id(host_id, fqdn):
     if not response:
         return "not found"
     elif response[0]["name"] != fqdn:
-        return "generic maintenance: " + response[0]["name"]
+        if "Scripted Maintenance" in response[0]["name"]:
+            return response[0]["maintenanceid"]
+        else:
+            return "Generic maintenance: " + response[0]["name"]
     else:
         result = response[0]["maintenanceid"]
         return result
@@ -264,8 +267,8 @@ def create_a_maintenance(fqdn, duration):
             response = add_maintenance(host_id, duration, fqdn)
             click.echo('Maintenance id %s for %s added' % (response, fqdn))
         else:
-            click.echo('Sorry maintenance already existe for %s ' % (fqdn))
-            if "generic maintenance:" in maintenance_id:
+            click.echo('Maintenance already existe for %s ' % (fqdn))
+            if "Generic maintenance:" in maintenance_id:
                 click.echo('%s is in %s' % (fqdn, maintenance_id))
             else:
                 response = zapi.maintenance.get(
@@ -276,10 +279,27 @@ def create_a_maintenance(fqdn, duration):
                 )
                 now = int(time.time())
                 duration_plan = int(duration + now)
-                if int(response['active_till']) < duration_plan:
-                    click.echo('update')
+                if int(response[0]['active_till']) < duration_plan:
+                    click.echo('Extended maintenance is possible')
+                    start = int(time.time()) - 300
+                    end = start + int(duration) + 300
+                    response = zapi.maintenance.update(
+                        hostids=[host_id],
+                        active_since=start,
+                        active_till=end,
+                        maintenanceid=maintenance_id,
+                        timeperiods=[{"timeperiod_type": 0,
+                                      "start_date": start,
+                                      "period": duration_plan
+                                      }],
+                    )
+                    if response["maintenanceids"] == maintenance_id:
+                        click.echo('Maintenance extended')
+                    else:
+                        click.echo('Error no update maintenance possible')
+
                 else:
-                    click.echo('no update')
+                    click.echo('It is not possible to extend maintenance, sorry')
 
 
 @maintenance.command("del")
