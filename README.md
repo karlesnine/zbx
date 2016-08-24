@@ -1,10 +1,18 @@
 # zbx 
-zabbix command line interface 
-- Python2.7 & Python3.5 tested
-- [pyzabbix 0.7.4](https://github.com/lukecyca/pyzabbix)
-- [tabulate 0.7.5](https://bitbucket.org/cesan3/python-tabulate) commit 3392795 - with fix #65 for ANSI Color
-- [Click (6.6 tested)](https://github.com/pallets/click) a command line library for Python
-- [Requests v2.11.0](https://github.com/kennethreitz/requests) HTTP for Humans
+[Zabbix](http://www.zabbix.com/) command line interface 
+Python2.7 & Python3.5 tested
+
+## Sponsor
+**Developed with the support and help of [BlaBlaCar](https://www.blablacar.co.uk/).**
+
+BlaBlaCar is trusted community marketplace that connects drivers with empty seats to passengers looking for a ride.
+Hoping to give them an effective tool
+
+## Requierement
+- >= [pyzabbix 0.7.4](https://github.com/lukecyca/pyzabbix)
+- >= [tabulate 0.7.5](https://bitbucket.org/cesan3/python-tabulate) commit 3392795 - with fix #65 for ANSI Color
+- >= [Click (6.6 tested)](https://github.com/pallets/click) a command line library for Python
+- >= [Requests v2.11.0](https://github.com/kennethreitz/requests) HTTP for Humans
 
 ## Install
 Exemple based on a debian linux box
