@@ -123,8 +123,6 @@ def get_host_id(fqdn):
         filter={"host": fqdn}
     )
     if not response:
-        # click.echo('Host not found in Zabbix : %s' % fqdn)
-        # sys.exit(42)
         return "not found"
     else:
         result = response[0]["hostid"]
@@ -138,8 +136,6 @@ def get_template_id(template_name):
         filter={"host": "Template OS Linux"}
     )
     if not response:
-        # click.echo('Template not found in Zabbix : %s' % template_name)
-        # sys.exit(42)
         return "not found"
     else:
         result = response[0]["templateid"]
@@ -153,8 +149,6 @@ def get_group_id(group_name):
         filter={"name": group_name}
     )
     if not response:
-        # click.echo('Group Name not found in Zabbix : %s' % group_name)
-        # sys.exit(42)
         return "not found"
     else:
         result = response[0]["groupid"]
