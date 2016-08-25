@@ -75,7 +75,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
-@click.version_option(version='3.0.1')
+@click.version_option(version='3.0.2')
 def zabbix():
     """Zabbix user command line tools."""
     pass
@@ -461,16 +461,16 @@ def disable(fqdn):
 
 
 @alert.command("list")
-@click.argument('nb', default=200)
+@click.argument('nb', default=100)
 def list_alert(nb):
-    """List the last N alert (200 by default).
+    """List the last N alert (100 by default).
 
     With all that in "warning" or supperior in red
     if no maintenance is configured or acknowledgement envoy
     """
     int_nb = int(nb)
     tableau_alerte = []
-    triggers = zapi.trigger.get(limite=int_nb,
+    triggers = zapi.trigger.get(limit=int_nb,
                                 selectLastEvent='extend',
                                 selectGroups='extend',
                                 selectHosts='extend',
