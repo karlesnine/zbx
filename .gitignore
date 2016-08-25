@@ -1,3 +1,5 @@
+.cache/
+.coverage
 vendor/python/__pycache__/
 zbx.egg-info/
 __pycache__/
