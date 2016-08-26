@@ -34,9 +34,20 @@ Example based on a debian linux box.
 - Add server url, login and password in `config.ini`
 - run `pip3 install --no-cache-dir --editable .`
 
+
 ## Test
 - run `cd ~` + `wich zbx` 
 - run `zbx --version`from any where in your filesystem tree
+
+### Python2
+- pip install pytest
+- pip install pytest-cov
+- run `pytest test.py --cov=zbx.py`
+
+### Python3
+- pip3 install pytest
+- pip3 install pytest-cov
+- run `pytest test.py --cov=zbx.py`
 
 ## Versions
 - 3.0.1
