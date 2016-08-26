@@ -133,7 +133,7 @@ def get_template_id(template_name):
     """Get the template id."""
     response = zapi.template.get(
         output='extend',
-        filter={"host": "Template OS Linux"}
+        filter={"host": template_name}
     )
     if not response:
         return "not found"
