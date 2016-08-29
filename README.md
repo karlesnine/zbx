@@ -34,32 +34,32 @@ Example based on a debian linux box.
 - Add server url, login and password in `config.ini`
 - run `pip3 install --no-cache-dir --editable .`
 
+
 ## Test
 - run `cd ~` + `wich zbx` 
 - run `zbx --version`from any where in your filesystem tree
 
-## Versions
-- 3.0.1
-  - zbx group list
-  - zbx alert history
-  - zbx host notemplate
-- 3.0.0
-  - Python 2.7 & 3.5 compliance
-- 2.0.0
-  - zbx alert list
-  - zbx alert ack EVEN-ID MESSAGE
-  - zbx host add FQDN
-  - zbx host del FQDN
-  - zbx maintenance add FQDN DURATION
-  - zbx maintenance del FQDN DURATION
-  - zbx maintenance list
-  - zbx maintenance gc
-  - zbx monitor enable FQDN
-  - zbx monitor disable FQDN
-  - zbx unmonitored
+### Python2
+- pip install pytest
+- pip install pytest-cov
+- run `pytest test.py --cov=zbx.py`
 
-- 1.0.0
-	- rename to zbx
-	- use click for implement argument & option 
-- 0.0.0
-	- p.o.c alerts.py
+### Python3
+- pip3 install pytest
+- pip3 install pytest-cov
+- run `pytest test.py --cov=zbx.py`
+
+## Command
+- zbx group list : List every host in a specific group
+- zbx alert history : List all reported issues with a alert send to current user
+- zbx alert ack EVEN-ID MESSAGE : Acknowledge a alert
+- zbx host add FQDN : Delete a host in zabbix server (FQDN must be a true record dns)
+- zbx host del FQDN : Delete a host in zabbix server
+- zbx host notemplate : List all host without template (and thus not monitored)
+- zbx maintenance add FQDN DURATION : Create a dedicated maintenance for a particular host
+- zbx maintenance del FQDN DURATION : Delete a dedicated maintenance for a particular host
+- zbx maintenance list : List all maintenance present, expired or not
+- zbx maintenance gc : Delete all expired ("Active till date time" is exceeded) maintenance
+- zbx monitor enable FQDN : Enable monitoring for a host in zabbix server
+- zbx monitor disable FQDN : Disable monitoring for a host in zabbix server
+- zbx unmonitored : List all host with monitoring disable in zabbix server

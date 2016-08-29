@@ -123,8 +123,6 @@ def get_host_id(fqdn):
         filter={"host": fqdn}
     )
     if not response:
-        # click.echo('Host not found in Zabbix : %s' % fqdn)
-        # sys.exit(42)
         return "not found"
     else:
         result = response[0]["hostid"]
@@ -135,11 +133,9 @@ def get_template_id(template_name):
     """Get the template id."""
     response = zapi.template.get(
         output='extend',
-        filter={"host": "Template OS Linux"}
+        filter={"host": template_name}
     )
     if not response:
-        # click.echo('Template not found in Zabbix : %s' % template_name)
-        # sys.exit(42)
         return "not found"
     else:
         result = response[0]["templateid"]
@@ -153,8 +149,6 @@ def get_group_id(group_name):
         filter={"name": group_name}
     )
     if not response:
-        # click.echo('Group Name not found in Zabbix : %s' % group_name)
-        # sys.exit(42)
         return "not found"
     else:
         result = response[0]["groupid"]
@@ -227,6 +221,17 @@ def get_event(eventid):
     )
     return response[0]
 
+
+def get_user_id(user_alias):
+    """Get user id."""
+    response = zapi.user.get(
+        output="extend",
+        filter={"alias": user_alias}
+    )
+    if not response:
+        return "not found"
+    else:
+        return response[0]["userid"]
 
 ##########################################################################
 # Maintenance sub command
@@ -517,8 +522,9 @@ def history_alerts(days):
     n_day = int(days)
     secondes = (86400 * n_day)
     time_from = now - secondes
+    userids = get_user_id(ZABBIX_USER)
     history = zapi.alert.get(
-        userids=9,
+        userids=userids,
         output="extend",
         sortfield="alertid",
         sortorder="DESC",
