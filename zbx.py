@@ -222,6 +222,17 @@ def get_event(eventid):
     return response[0]
 
 
+def get_user_id(user_alias):
+    """Get user id."""
+    response = zapi.user.get(
+        output="extend",
+        filter={"alias": user_alias}
+    )
+    if not response:
+        return "not found"
+    else:
+        return response[0]["userid"]
+
 ##########################################################################
 # Maintenance sub command
 ##########################################################################
@@ -511,8 +522,9 @@ def history_alerts(days):
     n_day = int(days)
     secondes = (86400 * n_day)
     time_from = now - secondes
+    userids = get_user_id(ZABBIX_USER)
     history = zapi.alert.get(
-        userids=9,
+        userids=userids,
         output="extend",
         sortfield="alertid",
         sortorder="DESC",
