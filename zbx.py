@@ -407,10 +407,10 @@ def get_list_server_without_template():
 ##########################################################################
 
 
-@group.command("list")
+@group.command("show")
 @click.argument('group_name')
 def list_server_in_group(group_name):
-    """List server in groupe name."""
+    """Show server list in groupe name."""
     group_id = get_group_id(group_name)
     if group_id == "not found":
         click.echo('Group not found in Zabbix : %s' % group_id)
@@ -425,6 +425,20 @@ def list_server_in_group(group_name):
             tableau_server_in_group.append([host["name"], group_name])
         header = [Bold + "NAME", "GROUP" + UnBold]
         print(tabulate(tableau_server_in_group, headers=header, tablefmt="plain"))
+
+
+@group.command("list")
+def list_group():
+    """List server group."""
+    tableau_group = []
+    list_group = zapi.hostgroup.get(
+        output='extend',
+    )
+    click.secho('- Group Name in zabbix server -', bold=True)
+    for group in list_group:
+        tableau_group.append(group["name"])
+    for name in sorted(tableau_group):
+        click.echo('%s' % name)
 
 ##########################################################################
 # Monitor COMMANDS
