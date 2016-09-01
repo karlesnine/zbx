@@ -50,7 +50,8 @@ Example based on a debian linux box.
 - run `pytest test.py --cov=zbx.py`
 
 ## Command
-- zbx group list : List every host in a specific group
+- zbx group list : List all server group in the zabbix server
+- zbx group show GROUP_NAME: List every host in a specific group
 - zbx alert history : List all reported issues with a alert send to current user
 - zbx alert ack EVEN-ID MESSAGE : Acknowledge a alert
 - zbx host add FQDN : Delete a host in zabbix server (FQDN must be a true record dns)
