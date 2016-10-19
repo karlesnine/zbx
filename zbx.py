@@ -440,8 +440,7 @@ def host_link_template(fqdn, template):
             hosts=[host_id],
             templates=[template_id]
         )
-    print(response)
-    click.echo('%s id is linked to %s on the zabbix server' % (fqdn, template))
+    click.echo('%s is now linked to %s on zabbix server' % (fqdn, template))
 
 ##########################################################################
 # Group COMMANDS
