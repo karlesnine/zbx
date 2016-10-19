@@ -28,7 +28,8 @@ def fake_zbx():
                 u'jmx_disable_until': u'0', u'jmx_error': u'', u'jmx_available': u'0',
                 u'maintenanceid': u'0', u'status': u'0', u'snmp_available': u'0',
                 u'error': u'', u'maintenance_from': u'0', u'flags': u'0',
-                u'errors_from': u'0'}]}
+                u'errors_from': u'0'
+            }]}
         elif m == "template.get":
             return {'result': [{
                 u'proxy_hostid': '0', u'host': u'Template OS Linux', u'status': '3',
@@ -44,6 +45,33 @@ def fake_zbx():
                 u'description': '', u'tls_connect': '1', u'tls_accept': '1',
                 u'tls_issuer': '', u'tls_subject': '', u'tls_psk_identity': '', u'tls_psk': ''
             }]}
+        elif m == "hostgroup.get":
+            return {'result': [{
+                "groupid": "5",
+                "name": "Discovered hosts",
+                "internal": "0"
+            }]}
+        elif m == "maintenance.get":
+            return {'result': [{
+                'groups': [], 'maintenanceid': '12798', 'hosts': [{'hostid': '10084'}], 'maintenance_type': '0',
+                'description': "'zbx scripted'", 'active_since': '1472544060', 'active_till': '1472545080',
+                'name': 'Scripted Maintenance: zabbix.prod.zbx'
+            }]}
+        elif m == "maintenance.delete" or m == "maintenance.create":
+            return {'result': {
+                'maintenanceids': ['12798']
+            }}
+        elif m == "event.get":
+            return {'result': [{
+                'acknowledged': '0', 'source': '0', 'acknowledges': [], 'object': '0', 'value': '0', 'objectid': '673566',
+                'eventid': '9811266', 'ns': '131739789', 'clock': '1472484419'
+            }]}
+        elif m == "user.get":
+            return {'result': [{
+                'rows_per_page': '50', 'theme': 'default', 'alias': 'admin', 'autologout': '0', 'url': '', 'attempt_clock': '1463992790',
+                'userid': '1', 'attempt_ip': '10.44.0.10', 'surname': 'Croix', 'lang': 'en_GB', 'attempt_failed': '0', 'refresh': '30',
+                'autologin': '1', 'type': '3', 'name': 'admin'
+            }]}
         else:
             return "42"
 
@@ -57,7 +85,49 @@ def test_get_host_id(fake_zbx):
     assert response == "10084"
 
 
-def test_get_template_id():
+def test_get_template_id(fake_zbx):
     """Test_get_template_id."""
     response = zbx.get_template_id("Template OS Linux")
     assert response == "10001"
+
+
+def test_get_group_id(fake_zbx):
+    """Test_get_host_id."""
+    response = zbx.get_group_id("Discovered hosts")
+    assert response == "5"
+
+
+def test_to_date():
+    """Test to_date."""
+    response = zbx.to_date(-37983434)
+    assert response == "1968-10-18 10:02:46"
+
+
+def test_get_maintenance_id(fake_zbx):
+    """Test get_maintenance_id."""
+    response = zbx.get_maintenance_id(10084, "zabbix.prod.zbx")
+    assert response == "12798"
+
+
+def test_delete_maintenance(fake_zbx):
+    """Test_delete_maintenance."""
+    response = zbx.delete_maintenance(12798)
+    assert response == ['12798']
+
+
+def test_add_maintenance(fake_zbx):
+    """Test_add_maintenance."""
+    response = zbx.add_maintenance(10084, 3600, "zabbix.prod.zbx")
+    assert response == ['12798']
+
+
+def test_get_event(fake_zbx):
+    """Test get_event."""
+    response = zbx.get_event(9811266)
+    assert response["eventid"] == "9811266"
+
+
+def test_get_user_id(fake_zbx):
+    """Test get_user_id."""
+    response = zbx.get_user_id('admin')
+    assert response == "1"
