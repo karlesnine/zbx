@@ -402,6 +402,46 @@ def get_list_server_without_template():
             tableau_server_without_template.append([h["name"], "without template"])
     print(tabulate(tableau_server_without_template, tablefmt="plain"))
 
+@host.command("template")
+@click.argument('fqdn')
+def get_host_template(fqdn):
+    """List templates for host."""
+    tableau_host_template = []
+    host_id = get_host_id(fqdn)
+    if host_id == "not found":
+        click.echo('Host not found in Zabbix : %s' % fqdn)
+        sys.exit(42)
+    else:
+        response = zapi.template.get(
+            output="extend",
+            hostids=host_id,
+            selectGroups="extend",
+        )
+    click.secho("-- Host: " + fqdn + " template --", bold=True)
+    for h in response:
+            tableau_host_template.append([h["name"]])
+    print(tabulate(tableau_host_template, tablefmt="plain"))
+
+@host.command("linktemplate")
+@click.argument('fqdn')
+@click.argument('template')
+def host_link_template(fqdn, template):
+    """List all serveur without template."""
+    host_id = get_host_id(fqdn)
+    template_id = get_template_id(template)
+    if host_id == "not found":
+        click.echo('Host not found in Zabbix : %s' % fqdn)
+        sys.exit(42)
+    elif template_id == "Not found":
+        click.echo('Template not found in Zabbix : %s' % template)
+        sys.exit(42)
+    else:
+        response = zapi.template.massadd(
+            hosts=[host_id],
+            templates=[template_id]
+        )
+    click.echo('%s is now linked to %s on zabbix server' % (fqdn, template))
+
 ##########################################################################
 # Group COMMANDS
 ##########################################################################
