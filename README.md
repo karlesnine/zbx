@@ -56,6 +56,8 @@ Example based on a debian linux box.
 - zbx host add FQDN : Delete a host in zabbix server (FQDN must be a true record dns)
 - zbx host del FQDN : Delete a host in zabbix server
 - zbx host notemplate : List all host without template (and thus not monitored)
+- zbx host template FQDN : List templates for a particular host
+- zbx host linktemplate FQDN TEMPLATE : Link particular template to particular host
 - zbx maintenance add FQDN DURATION : Create a dedicated maintenance for a particular host
 - zbx maintenance del FQDN DURATION : Delete a dedicated maintenance for a particular host
 - zbx maintenance list : List all maintenance present, expired or not
