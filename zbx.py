@@ -8,7 +8,8 @@
 try:
     import configparser
 except ImportError:
-    import ConfigParser
+    import ConfigParser as configparser
+    # from backports import configparser
 
 import os
 import re
@@ -18,7 +19,7 @@ import time
 from datetime import datetime
 
 # Find where the code is
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 # Force lib version embedded because tested or patched !
 vendor_dir = os.path.join(BASE_DIR, 'vendor/python')
@@ -402,6 +403,7 @@ def get_list_server_without_template():
             tableau_server_without_template.append([h["name"], "without template"])
     print(tabulate(tableau_server_without_template, tablefmt="plain"))
 
+
 @host.command("template")
 @click.argument('fqdn')
 def get_host_template(fqdn):
@@ -422,11 +424,12 @@ def get_host_template(fqdn):
             tableau_host_template.append([h["name"]])
     print(tabulate(tableau_host_template, tablefmt="plain"))
 
+
 @host.command("linktemplate")
 @click.argument('fqdn')
 @click.argument('template')
 def host_link_template(fqdn, template):
-    """List all serveur without template."""
+    """Link a specific template to specific host."""
     host_id = get_host_id(fqdn)
     template_id = get_template_id(template)
     if host_id == "not found":
