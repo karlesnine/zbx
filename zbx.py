@@ -8,7 +8,8 @@
 try:
     import configparser
 except ImportError:
-    import ConfigParser
+    import ConfigParser as configparser
+    # from backports import configparser
 
 import os
 import re
@@ -18,7 +19,7 @@ import time
 from datetime import datetime
 
 # Find where the code is
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 # Force lib version embedded because tested or patched !
 vendor_dir = os.path.join(BASE_DIR, 'vendor/python')
