@@ -52,21 +52,27 @@ You need Click! install it from https://github.com/pallets/click"
 or run : sudo pip3 install click."
 """)
 
-# Import config file for zabbix API access
-configfile = BASE_DIR + '/config.ini'
-config = configparser.ConfigParser()
-config.read(configfile)
-ZABBIX_HTTP_AUTH = config['zabbix']['http_auth']
-ZABBIX_SERVER = config['zabbix']['server']
-ZABBIX_USER = config['zabbix']['user']
-ZABBIX_PASSWORD = config['zabbix']['password']
-
 # Color stuff
 eCOLOR_NONE = "\033[0;39m"
 eLIGHT_RED = "\033[1;31m"
 eLIGHT_GREEN = "\033[1;32m"
 Bold = "\033[1m"
 UnBold = "\033(B\033[m"
+
+# Import config file for zabbix API access
+configfile = BASE_DIR + '/config.ini'
+config = configparser.ConfigParser()
+config.read(configfile)
+try:
+    ZABBIX_HTTP_AUTH = config['zabbix']['http_auth']
+except :
+    warn = eLIGHT_RED +'WARN : ' + eCOLOR_NONE + 'check your configini file because key http_auth not exist'
+    click.echo(warn)
+    click.pause()
+    ZABBIX_HTTP_AUTH = 'false'
+ZABBIX_SERVER = config['zabbix']['server']
+ZABBIX_USER = config['zabbix']['user']
+ZABBIX_PASSWORD = config['zabbix']['password']
 
 # Create connection to the zabbix api
 zapi = ZabbixAPI(ZABBIX_SERVER)
