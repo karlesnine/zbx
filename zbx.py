@@ -56,6 +56,7 @@ or run : sudo pip3 install click."
 configfile = BASE_DIR + '/config.ini'
 config = configparser.ConfigParser()
 config.read(configfile)
+ZABBIX_HTTP_AUTH = config['zabbix']['http_auth']
 ZABBIX_SERVER = config['zabbix']['server']
 ZABBIX_USER = config['zabbix']['user']
 ZABBIX_PASSWORD = config['zabbix']['password']
@@ -69,7 +70,19 @@ UnBold = "\033(B\033[m"
 
 # Create connection to the zabbix api
 zapi = ZabbixAPI(ZABBIX_SERVER)
-zapi.login(ZABBIX_USER, ZABBIX_PASSWORD)
+
+# What kind of auth ? http_auth or zabbix_auth ?
+if ZABBIX_HTTP_AUTH == 'true':
+    # Enable HTTP auth
+    zapi.session.auth = (ZABBIX_USER, ZABBIX_PASSWORD)
+    # Disable SSL certificate verification
+    zapi.session.verify = False
+    # login
+    zapi.login(ZABBIX_USER, ZABBIX_PASSWORD)
+else:
+    # Create connection to the zabbix api
+    zapi = ZabbixAPI(ZABBIX_SERVER)
+    zapi.login(ZABBIX_USER, ZABBIX_PASSWORD)
 
 # use Click, a command line library for Python
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
