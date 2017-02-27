@@ -5,4 +5,6 @@ zbx.egg-info/
 __pycache__/
 vendor/python/__pycache__/*
 config.ini*
+*.bck
 *.pyc
+.DS_Store

@@ -52,6 +52,7 @@ Example based on a debian linux box.
 ## Command
 - zbx group list : List all server group in the zabbix server
 - zbx group show GROUP_NAME: List every host in a specific group
+- zbx alert list : All alert currently up
 - zbx alert history : List all reported issues with a alert send to current user
 - zbx alert ack EVEN-ID MESSAGE : Acknowledge a alert
 - zbx host add FQDN : Delete a host in zabbix server (FQDN must be a true record dns)
@@ -66,3 +67,5 @@ Example based on a debian linux box.
 - zbx monitor enable FQDN : Enable monitoring for a host in zabbix server
 - zbx monitor disable FQDN : Disable monitoring for a host in zabbix server
 - zbx unmonitored : List all host with monitoring disable in zabbix server
+- zbx items get ITEM.KEY --group GROUP_NAME: List the last item value for the item.key provided for all host in a group
+- zbx items get ITEM.KEY --host HOST : List the last item value for the item.key provided for the host
