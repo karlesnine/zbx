@@ -213,10 +213,10 @@ def get_maintenance_id(host_id, fqdn):
     if not response:
         return "not found"
     elif response[0]["name"] != fqdn:
-        if "Scripted Maintenance" in response[0]["name"]:
+        if "ZbxScripted" in response[0]["name"]:
             return response[0]["maintenanceid"]
         else:
-            return "Generic maintenance: " + response[0]["name"]
+            return "Other maintenance: " + response[0]["name"]
     else:
         result = response[0]["maintenanceid"]
         return result
@@ -240,7 +240,7 @@ def add_maintenance(host_id, duration, fqdn):
     response = zapi.maintenance.create(
         groupids=["5"],
         hostids=[host_id],
-        name="Scripted Maintenance: %s" % fqdn,
+        name="ZbxScripted : %s" % fqdn,
         maintenance_type=0,
         description="zbx scripted",
         active_since=start,
@@ -353,7 +353,7 @@ def create_a_maintenance(fqdn, duration):
             click.echo('Maintenance id %s for %s added' % (response, fqdn))
         else:
             click.echo('Maintenance already existe for %s ' % (fqdn))
-            if "Generic maintenance:" in maintenance_id:
+            if "Other maintenance:" in maintenance_id:
                 click.echo('%s is in %s' % (fqdn, maintenance_id))
             else:
                 response = zapi.maintenance.get(
@@ -378,7 +378,7 @@ def create_a_maintenance(fqdn, duration):
                                       "period": duration_plan
                                       }],
                     )
-                    if response["maintenanceids"] == maintenance_id:
+                    if response["maintenanceids"][0] == maintenance_id:
                         click.echo('Maintenance extended')
                     else:
                         click.echo('Error no update maintenance possible')
