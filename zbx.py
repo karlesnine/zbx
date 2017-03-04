@@ -254,7 +254,7 @@ def add_maintenance(host_id, duration, fqdn):
     response = zapi.maintenance.create(
         groupids=["5"],
         hostids=[host_id],
-        name="ZbxScripted : %s" % fqdn,
+        name="ZbxScripted: %s" % fqdn,
         maintenance_type=0,
         description="zbx scripted",
         active_since=start,
