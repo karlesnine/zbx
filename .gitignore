@@ -1,3 +1,4 @@
+dist
 .cache/
 .coverage
 vendor/python/__pycache__/
