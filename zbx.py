@@ -62,7 +62,7 @@ try:
     config = configparser.ConfigParser()
     config.read(configfile)
 except KeyError:
-    print "No environment variable ZBX_CONF_FILE, use config.ini"
+    click.echo('No environment variable ZBX_CONF_FILE, use config.ini')
     configfile = BASE_DIR + '/config.ini'
     config = configparser.ConfigParser()
     config.read(configfile)
