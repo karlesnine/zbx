@@ -55,7 +55,7 @@ def fake_zbx():
             return {'result': [{
                 'groups': [], 'maintenanceid': '12798', 'hosts': [{'hostid': '10084'}], 'maintenance_type': '0',
                 'description': "'zbx scripted'", 'active_since': '1472544060', 'active_till': '1472545080',
-                'name': 'Scripted Maintenance: zabbix.prod.zbx'
+                'name': 'ZbxScripted: zabbix.prod.zbx'
             }]}
         elif m == "maintenance.delete" or m == "maintenance.create":
             return {'result': {
