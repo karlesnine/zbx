@@ -18,36 +18,60 @@ Hoping to give them an effective tool
 Example based on a debian linux box.
 
 ### Python2
+
+#### For test & dev
+
 - Install pip `apt-get install python-pip`
 - Upgrade pip `easy_install -U pip`
 - Install ConfigParser `pip install ConfigParser`
 - Install Logging `pip install logging`
 - Rename `config.ini.example` to `config.ini`
 - Add server url, login and password in `config.ini`
-- run `pip3 install --editable .`
+- Run `pip3 install --editable .`
+
+#### Easyway
+- run `python2 setup.py install`
 
 ### Python3
+
+#### For test & dev
+
 - Install python 3 `apt-get install python3` 
 - Install pip3 `apt-get install python3-pip`
 - Upgrade pip3 `easy_install3 -U pip`
 - Rename `config.ini.example` to `config.ini`
 - Add server url, login and password in `config.ini`
-- run `pip3 install --no-cache-dir --editable .`
+- Run `pip3 install --no-cache-dir --editable .`
 
+#### Easyway
+- run `python3 setup.py install`
 
-## Test
+### Configuration
+- Look `config.ini.example` for example
+- Create a `config.ini` like `config.ini.example`
+Or
+- Set environment variable `ZBX_CONF_FILE` with the config name file
+
+## Tests
+
+### Install Test
 - run `cd ~` + `wich zbx` 
 - run `zbx --version`from any where in your filesystem tree
+
+### Dev Test
+- Install pytest `pip3 search pytest`
+- Install pytest-cov `pip3 install pytest-cov`
+- Run `pytest zbx_test.py --cov=zbx.py`
 
 ### Python2
 - pip install pytest
 - pip install pytest-cov
-- run `pytest test.py --cov=zbx.py`
+- Run `pytest test.py --cov=zbx.py`
 
 ### Python3
 - pip3 install pytest
 - pip3 install pytest-cov
-- run `pytest test.py --cov=zbx.py`
+- Run `pytest test.py --cov=zbx.py`
 
 ## Command
 - zbx group list : List all server group in the zabbix server
