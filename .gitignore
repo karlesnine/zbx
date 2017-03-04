@@ -4,7 +4,7 @@ vendor/python/__pycache__/
 zbx.egg-info/
 __pycache__/
 vendor/python/__pycache__/*
-config.ini*
+config*ini
 *.bck
 *.pyc
 .DS_Store
