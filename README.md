@@ -29,7 +29,7 @@ Example based on a debian linux box.
 - Add server url, login and password in `config.ini`
 - Run `pip3 install --editable .`
 
-#### Easyway
+#### Easy way
 - run `python2 setup.py install`
 
 ### Python3
@@ -43,7 +43,7 @@ Example based on a debian linux box.
 - Add server url, login and password in `config.ini`
 - Run `pip3 install --no-cache-dir --editable .`
 
-#### Easyway
+#### Easy way
 - run `python3 setup.py install`
 
 ### Configuration
