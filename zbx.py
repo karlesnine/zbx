@@ -358,7 +358,7 @@ def create_a_maintenance(fqdn, duration):
     host_id = get_host_id(fqdn)
     if host_id == "not found":
         click.echo('Host not found in Zabbix : %s' % fqdn)
-        sys.exit(42)
+        sys.exit(0)
     else:
         maintenance_id = get_maintenance_id(host_id, fqdn)
         if maintenance_id == "not found":
