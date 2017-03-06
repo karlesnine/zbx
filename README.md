@@ -47,9 +47,11 @@ Example based on a debian linux box.
 - run `python3 setup.py install`
 
 ### Configuration
+#### Default
 - Look `config.ini.example` for example
 - Create a `config.ini` like `config.ini.example`
-Or
+
+#### Option
 - Set environment variable `ZBX_CONF_FILE` with the config name file
 
 ## Tests
