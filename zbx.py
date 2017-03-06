@@ -52,6 +52,22 @@ You need Click! install it from https://github.com/pallets/click"
 or run : sudo pip3 install click."
 """)
 
+
+# Import config file for zabbix API access
+# if ZBX_CONF_FILE is set from environment use it
+# if not use ./config.ini
+try:
+    os.environ['ZBX_CONF_FILE']
+    configfile = BASE_DIR + '/' + os.environ['ZBX_CONF_FILE']
+    config = configparser.ConfigParser()
+    config.read(configfile)
+except KeyError:
+    click.echo('No environment variable ZBX_CONF_FILE, use config.ini')
+    configfile = BASE_DIR + '/config.ini'
+    config = configparser.ConfigParser()
+    config.read(configfile)
+
+
 # Color stuff
 eCOLOR_NONE = "\033[0;39m"
 eLIGHT_RED = "\033[1;31m"
@@ -59,10 +75,7 @@ eLIGHT_GREEN = "\033[1;32m"
 Bold = "\033[1m"
 UnBold = "\033(B\033[m"
 
-# Import config file for zabbix API access
-configfile = BASE_DIR + '/config.ini'
-config = configparser.ConfigParser()
-config.read(configfile)
+
 try:
     ZABBIX_HTTP_AUTH = config['zabbix']['http_auth']
 except:
@@ -70,6 +83,7 @@ except:
     click.echo(warn)
     click.pause()
     ZABBIX_HTTP_AUTH = 'false'
+
 ZABBIX_SERVER = config['zabbix']['server']
 ZABBIX_USER = config['zabbix']['user']
 ZABBIX_PASSWORD = config['zabbix']['password']
@@ -240,7 +254,7 @@ def add_maintenance(host_id, duration, fqdn):
     response = zapi.maintenance.create(
         groupids=["5"],
         hostids=[host_id],
-        name="ZbxScripted : %s" % fqdn,
+        name="ZbxScripted: %s" % fqdn,
         maintenance_type=0,
         description="zbx scripted",
         active_since=start,
@@ -344,7 +358,7 @@ def create_a_maintenance(fqdn, duration):
     host_id = get_host_id(fqdn)
     if host_id == "not found":
         click.echo('Host not found in Zabbix : %s' % fqdn)
-        sys.exit(42)
+        sys.exit(0)
     else:
         maintenance_id = get_maintenance_id(host_id, fqdn)
         if maintenance_id == "not found":
