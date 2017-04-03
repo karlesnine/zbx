@@ -604,6 +604,9 @@ def enable(fqdn):
 def disable(fqdn):
     """Disable monitoring for a host."""
     host_id = get_host_id(fqdn)
+    if host_id == "not found":
+        click.echo('Host not found in Zabbix : %s' % fqdn)
+        sys.exit(0)
     response = zapi.host.update(
         hostid=host_id,
         status=1
