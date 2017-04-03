@@ -29,6 +29,7 @@ from pyzabbix import ZabbixAPI
 
 from tabulate import tabulate
 
+
 ############################################
 # Use for debug exchange with api
 ############################################
@@ -408,12 +409,12 @@ def delete_a_maintenance(fqdn):
     host_id = get_host_id(fqdn)
     if host_id == "not found":
         click.echo('Host not found in Zabbix : %s' % fqdn)
-        sys.exit(42)
+        sys.exit(0)
     else:
         maintenance_id = get_maintenance_id(host_id, fqdn)
         if maintenance_id == "not found":
             click.echo('Maintenance not found in Zabbix')
-            sys.exit(42)
+            sys.exit(0)
         else:
             response = delete_maintenance(maintenance_id)
             click.echo('Maintenance id %s for %s removed' % (response, fqdn))
@@ -455,7 +456,7 @@ def create_a_host(fqdn):
     template_os_linux = get_template_id("Template OS Linux")
     if template_os_linux == "not found":
         click.echo('template not found in Zabbix : %s' % template_os_linux)
-        sys.exit(42)
+        sys.exit(0)
     else:
         dns_data = socket.gethostbyname_ex(fqdn)
         ip = dns_data[2][0]
@@ -475,7 +476,7 @@ def delete_a_host(fqdn):
     host_id = get_host_id(fqdn)
     if host_id == "not found":
         click.echo('Host not found in Zabbix : %s' % fqdn)
-        sys.exit(42)
+        sys.exit(0)
     else:
         response = zapi.host.delete(host_id)
         click.echo('%s id %s is removed of the zabbix server' % (fqdn, response["hostids"][0]))
@@ -505,7 +506,7 @@ def get_host_template(fqdn):
     host_id = get_host_id(fqdn)
     if host_id == "not found":
         click.echo('Host not found in Zabbix : %s' % fqdn)
-        sys.exit(42)
+        sys.exit(0)
     else:
         response = zapi.template.get(
             output="extend",
@@ -527,10 +528,10 @@ def host_link_template(fqdn, template):
     template_id = get_template_id(template)
     if host_id == "not found":
         click.echo('Host not found in Zabbix : %s' % fqdn)
-        sys.exit(42)
+        sys.exit(0)
     elif template_id == "Not found":
         click.echo('Template not found in Zabbix : %s' % template)
-        sys.exit(42)
+        sys.exit(0)
     else:
         response = zapi.template.massadd(
             hosts=[host_id],
@@ -550,7 +551,7 @@ def list_server_in_group(group_name):
     group_id = get_group_id(group_name)
     if group_id == "not found":
         click.echo('Group not found in Zabbix : %s' % group_id)
-        sys.exit(42)
+        sys.exit(0)
     else:
         tableau_server_in_group = []
         list_servers = zapi.host.get(
@@ -588,7 +589,7 @@ def enable(fqdn):
     host_id = get_host_id(fqdn)
     if host_id == "not found":
         click.echo('Host not found in Zabbix : %s' % fqdn)
-        sys.exit(42)
+        sys.exit(0)
     else:
         # enable is status = 0
         response = zapi.host.update(
@@ -603,6 +604,9 @@ def enable(fqdn):
 def disable(fqdn):
     """Disable monitoring for a host."""
     host_id = get_host_id(fqdn)
+    if host_id == "not found":
+        click.echo('Host not found in Zabbix : %s' % fqdn)
+        sys.exit(0)
     response = zapi.host.update(
         hostid=host_id,
         status=1
