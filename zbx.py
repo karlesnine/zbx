@@ -441,7 +441,7 @@ def gc():
             else:
                 click.echo('Removing expired %s' % m['name'])
     else:
-        click.echo('No expired maintenance to remove')
+        click.echo('No expired maintenance to remove in Zabbix')
 
 
 ##########################################################################
@@ -611,7 +611,7 @@ def disable(fqdn):
         hostid=host_id,
         status=1
     )
-    click.echo('%s id %s is not monitored now' % (fqdn, response["hostids"]))
+    click.echo('%s id %s is not monitored by Zabbix now' % (fqdn, response["hostids"]))
 
 
 ##########################################################################
