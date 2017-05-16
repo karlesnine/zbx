@@ -7,3 +7,6 @@ http_auth=false
 user=LOGIN
 # User paswword to the Zabbix API
 password=PASSWORD
+# Dedicated user for on-call
+# Can be the same as user
+oncall=astreinte

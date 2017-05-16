@@ -88,6 +88,7 @@ except:
 ZABBIX_SERVER = config['zabbix']['server']
 ZABBIX_USER = config['zabbix']['user']
 ZABBIX_PASSWORD = config['zabbix']['password']
+ZABBIX_ON_CALL = config['zabbix']['oncall']
 
 # Create connection to the zabbix api
 zapi = ZabbixAPI(ZABBIX_SERVER)
@@ -676,7 +677,7 @@ def history_alerts(days):
     n_day = int(days)
     secondes = (86400 * n_day)
     time_from = now - secondes
-    userids = get_user_id(ZABBIX_USER)
+    userids = get_user_id(ZABBIX_ON_CALL)
     history = zapi.alert.get(
         userids=userids,
         output="extend",
