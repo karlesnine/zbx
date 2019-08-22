@@ -311,12 +311,14 @@ def get_key_item(host_id, item_key_name):
 
 def get_item_last_value(item_value_type, item_searched_id, host_id):
     """Get item last value."""
+    time_now = int(time.time())
+
     response = zapi.history.get(
         history=item_value_type,
         output='extend',
         itemids=item_searched_id,
-        time_from=time.time() - 7200,
-        time_till=time.time(),
+        time_from=time_now - 7200,
+        time_till=time_now,
         hostids=host_id,
         sortfield='clock',
         sortorder='DESC',
